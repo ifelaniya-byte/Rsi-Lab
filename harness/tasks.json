@@ -1,0 +1,982 @@
+[
+  {
+    "id": "repair-01",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_to_n` that returns the sum of all integers from 0 to n inclusive.",
+    "starter": "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total",
+    "dev": true
+  },
+  {
+    "id": "repair-02",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `count_even` that counts how many even numbers are in the list `nums`.",
+    "starter": "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count",
+    "dev": true
+  },
+  {
+    "id": "repair-03",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `factorial` that returns the factorial of n.",
+    "starter": "def factorial(n):\n    return n * factorial(n - 1)",
+    "dev": true
+  },
+  {
+    "id": "repair-04",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `subtract` that returns a minus b.",
+    "starter": "def subtract(a, b):\n    return b - a",
+    "dev": true
+  },
+  {
+    "id": "repair-05",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `get_length` that returns the length of the list `lst`.",
+    "starter": "def get_length(lst):\n    len(lst)",
+    "dev": true
+  },
+  {
+    "id": "repair-06",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sort_copy` that returns a NEW sorted list without modifying the input list.",
+    "starter": "def sort_copy(lst):\n    lst.sort()\n    return lst",
+    "dev": false
+  },
+  {
+    "id": "repair-07",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `divide` that returns a divided by b as a float.",
+    "starter": "def divide(a, b):\n    return a // b",
+    "dev": false
+  },
+  {
+    "id": "repair-08",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_list` that returns the sum of all elements in `lst`.",
+    "starter": "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-09",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_to_n` that returns the sum of all integers from 0 to n inclusive.",
+    "starter": "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-10",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `count_even` that counts how many even numbers are in the list `nums`.",
+    "starter": "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count",
+    "dev": false
+  },
+  {
+    "id": "repair-11",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `factorial` that returns the factorial of n.",
+    "starter": "def factorial(n):\n    return n * factorial(n - 1)",
+    "dev": false
+  },
+  {
+    "id": "repair-12",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `subtract` that returns a minus b.",
+    "starter": "def subtract(a, b):\n    return b - a",
+    "dev": false
+  },
+  {
+    "id": "repair-13",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `get_length` that returns the length of the list `lst`.",
+    "starter": "def get_length(lst):\n    len(lst)",
+    "dev": false
+  },
+  {
+    "id": "repair-14",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sort_copy` that returns a NEW sorted list without modifying the input list.",
+    "starter": "def sort_copy(lst):\n    lst.sort()\n    return lst",
+    "dev": false
+  },
+  {
+    "id": "repair-15",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `divide` that returns a divided by b as a float.",
+    "starter": "def divide(a, b):\n    return a // b",
+    "dev": false
+  },
+  {
+    "id": "repair-16",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_list` that returns the sum of all elements in `lst`.",
+    "starter": "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-17",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_to_n` that returns the sum of all integers from 0 to n inclusive.",
+    "starter": "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-18",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `count_even` that counts how many even numbers are in the list `nums`.",
+    "starter": "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count",
+    "dev": false
+  },
+  {
+    "id": "repair-19",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `factorial` that returns the factorial of n.",
+    "starter": "def factorial(n):\n    return n * factorial(n - 1)",
+    "dev": false
+  },
+  {
+    "id": "repair-20",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `subtract` that returns a minus b.",
+    "starter": "def subtract(a, b):\n    return b - a",
+    "dev": false
+  },
+  {
+    "id": "repair-21",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `get_length` that returns the length of the list `lst`.",
+    "starter": "def get_length(lst):\n    len(lst)",
+    "dev": false
+  },
+  {
+    "id": "repair-22",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sort_copy` that returns a NEW sorted list without modifying the input list.",
+    "starter": "def sort_copy(lst):\n    lst.sort()\n    return lst",
+    "dev": false
+  },
+  {
+    "id": "repair-23",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `divide` that returns a divided by b as a float.",
+    "starter": "def divide(a, b):\n    return a // b",
+    "dev": false
+  },
+  {
+    "id": "repair-24",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_list` that returns the sum of all elements in `lst`.",
+    "starter": "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-25",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_to_n` that returns the sum of all integers from 0 to n inclusive.",
+    "starter": "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-26",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `count_even` that counts how many even numbers are in the list `nums`.",
+    "starter": "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count",
+    "dev": false
+  },
+  {
+    "id": "repair-27",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `factorial` that returns the factorial of n.",
+    "starter": "def factorial(n):\n    return n * factorial(n - 1)",
+    "dev": false
+  },
+  {
+    "id": "repair-28",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `subtract` that returns a minus b.",
+    "starter": "def subtract(a, b):\n    return b - a",
+    "dev": false
+  },
+  {
+    "id": "repair-29",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `get_length` that returns the length of the list `lst`.",
+    "starter": "def get_length(lst):\n    len(lst)",
+    "dev": false
+  },
+  {
+    "id": "repair-30",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sort_copy` that returns a NEW sorted list without modifying the input list.",
+    "starter": "def sort_copy(lst):\n    lst.sort()\n    return lst",
+    "dev": false
+  },
+  {
+    "id": "repair-31",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `divide` that returns a divided by b as a float.",
+    "starter": "def divide(a, b):\n    return a // b",
+    "dev": false
+  },
+  {
+    "id": "repair-32",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_list` that returns the sum of all elements in `lst`.",
+    "starter": "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-33",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_to_n` that returns the sum of all integers from 0 to n inclusive.",
+    "starter": "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total",
+    "dev": false
+  },
+  {
+    "id": "repair-34",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `count_even` that counts how many even numbers are in the list `nums`.",
+    "starter": "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count",
+    "dev": false
+  },
+  {
+    "id": "repair-35",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `factorial` that returns the factorial of n.",
+    "starter": "def factorial(n):\n    return n * factorial(n - 1)",
+    "dev": false
+  },
+  {
+    "id": "repair-36",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `subtract` that returns a minus b.",
+    "starter": "def subtract(a, b):\n    return b - a",
+    "dev": false
+  },
+  {
+    "id": "repair-37",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `get_length` that returns the length of the list `lst`.",
+    "starter": "def get_length(lst):\n    len(lst)",
+    "dev": false
+  },
+  {
+    "id": "repair-38",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sort_copy` that returns a NEW sorted list without modifying the input list.",
+    "starter": "def sort_copy(lst):\n    lst.sort()\n    return lst",
+    "dev": false
+  },
+  {
+    "id": "repair-39",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `divide` that returns a divided by b as a float.",
+    "starter": "def divide(a, b):\n    return a // b",
+    "dev": false
+  },
+  {
+    "id": "repair-40",
+    "suite": "code-repair",
+    "prompt": "Fix the bug in the starter code. Write a function named `sum_list` that returns the sum of all elements in `lst`.",
+    "starter": "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total",
+    "dev": false
+  },
+  {
+    "id": "gen-01",
+    "suite": "code-gen",
+    "prompt": "Write a function named `filter_even` that takes appropriate arguments and returns the correct result.",
+    "starter": "def filter_even(lst):\n    '''Return a list of even numbers from lst.'''\n    pass",
+    "dev": true
+  },
+  {
+    "id": "gen-02",
+    "suite": "code-gen",
+    "prompt": "Write a function named `sum_of_squares` that takes appropriate arguments and returns the correct result.",
+    "starter": "def sum_of_squares(lst):\n    '''Return the sum of squares of elements in lst.'''\n    pass",
+    "dev": true
+  },
+  {
+    "id": "gen-03",
+    "suite": "code-gen",
+    "prompt": "Write a function named `count_words` that takes appropriate arguments and returns the correct result.",
+    "starter": "def count_words(s):\n    '''Return the number of words in string s.'''\n    pass",
+    "dev": true
+  },
+  {
+    "id": "gen-04",
+    "suite": "code-gen",
+    "prompt": "Write a function named `max_in_list` that takes appropriate arguments and returns the correct result.",
+    "starter": "def max_in_list(lst):\n    '''Return the maximum value in lst.'''\n    pass",
+    "dev": true
+  },
+  {
+    "id": "gen-05",
+    "suite": "code-gen",
+    "prompt": "Write a function named `is_palindrome` that takes appropriate arguments and returns the correct result.",
+    "starter": "def is_palindrome(s):\n    '''Return True if s is a palindrome.'''\n    pass",
+    "dev": true
+  },
+  {
+    "id": "gen-06",
+    "suite": "code-gen",
+    "prompt": "Write a function named `factorial` that takes appropriate arguments and returns the correct result.",
+    "starter": "def factorial(n):\n    '''Return the factorial of n.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-07",
+    "suite": "code-gen",
+    "prompt": "Write a function named `fibonacci` that takes appropriate arguments and returns the correct result.",
+    "starter": "def fibonacci(n):\n    '''Return the nth Fibonacci number.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-08",
+    "suite": "code-gen",
+    "prompt": "Write a function named `dict_sum` that takes appropriate arguments and returns the correct result.",
+    "starter": "def dict_sum(d):\n    '''Return the sum of all values in dictionary d.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-09",
+    "suite": "code-gen",
+    "prompt": "Write a function named `find_max_index` that takes appropriate arguments and returns the correct result.",
+    "starter": "def find_max_index(lst):\n    '''Return the index of the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-10",
+    "suite": "code-gen",
+    "prompt": "Write a function named `reverse_string` that takes appropriate arguments and returns the correct result.",
+    "starter": "def reverse_string(s):\n    '''Return the reversed string.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-11",
+    "suite": "code-gen",
+    "prompt": "Write a function named `filter_even` that takes appropriate arguments and returns the correct result.",
+    "starter": "def filter_even(lst):\n    '''Return a list of even numbers from lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-12",
+    "suite": "code-gen",
+    "prompt": "Write a function named `sum_of_squares` that takes appropriate arguments and returns the correct result.",
+    "starter": "def sum_of_squares(lst):\n    '''Return the sum of squares of elements in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-13",
+    "suite": "code-gen",
+    "prompt": "Write a function named `count_words` that takes appropriate arguments and returns the correct result.",
+    "starter": "def count_words(s):\n    '''Return the number of words in string s.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-14",
+    "suite": "code-gen",
+    "prompt": "Write a function named `max_in_list` that takes appropriate arguments and returns the correct result.",
+    "starter": "def max_in_list(lst):\n    '''Return the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-15",
+    "suite": "code-gen",
+    "prompt": "Write a function named `is_palindrome` that takes appropriate arguments and returns the correct result.",
+    "starter": "def is_palindrome(s):\n    '''Return True if s is a palindrome.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-16",
+    "suite": "code-gen",
+    "prompt": "Write a function named `factorial` that takes appropriate arguments and returns the correct result.",
+    "starter": "def factorial(n):\n    '''Return the factorial of n.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-17",
+    "suite": "code-gen",
+    "prompt": "Write a function named `fibonacci` that takes appropriate arguments and returns the correct result.",
+    "starter": "def fibonacci(n):\n    '''Return the nth Fibonacci number.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-18",
+    "suite": "code-gen",
+    "prompt": "Write a function named `dict_sum` that takes appropriate arguments and returns the correct result.",
+    "starter": "def dict_sum(d):\n    '''Return the sum of all values in dictionary d.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-19",
+    "suite": "code-gen",
+    "prompt": "Write a function named `find_max_index` that takes appropriate arguments and returns the correct result.",
+    "starter": "def find_max_index(lst):\n    '''Return the index of the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-20",
+    "suite": "code-gen",
+    "prompt": "Write a function named `reverse_string` that takes appropriate arguments and returns the correct result.",
+    "starter": "def reverse_string(s):\n    '''Return the reversed string.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-21",
+    "suite": "code-gen",
+    "prompt": "Write a function named `filter_even` that takes appropriate arguments and returns the correct result.",
+    "starter": "def filter_even(lst):\n    '''Return a list of even numbers from lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-22",
+    "suite": "code-gen",
+    "prompt": "Write a function named `sum_of_squares` that takes appropriate arguments and returns the correct result.",
+    "starter": "def sum_of_squares(lst):\n    '''Return the sum of squares of elements in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-23",
+    "suite": "code-gen",
+    "prompt": "Write a function named `count_words` that takes appropriate arguments and returns the correct result.",
+    "starter": "def count_words(s):\n    '''Return the number of words in string s.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-24",
+    "suite": "code-gen",
+    "prompt": "Write a function named `max_in_list` that takes appropriate arguments and returns the correct result.",
+    "starter": "def max_in_list(lst):\n    '''Return the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-25",
+    "suite": "code-gen",
+    "prompt": "Write a function named `is_palindrome` that takes appropriate arguments and returns the correct result.",
+    "starter": "def is_palindrome(s):\n    '''Return True if s is a palindrome.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-26",
+    "suite": "code-gen",
+    "prompt": "Write a function named `factorial` that takes appropriate arguments and returns the correct result.",
+    "starter": "def factorial(n):\n    '''Return the factorial of n.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-27",
+    "suite": "code-gen",
+    "prompt": "Write a function named `fibonacci` that takes appropriate arguments and returns the correct result.",
+    "starter": "def fibonacci(n):\n    '''Return the nth Fibonacci number.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-28",
+    "suite": "code-gen",
+    "prompt": "Write a function named `dict_sum` that takes appropriate arguments and returns the correct result.",
+    "starter": "def dict_sum(d):\n    '''Return the sum of all values in dictionary d.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-29",
+    "suite": "code-gen",
+    "prompt": "Write a function named `find_max_index` that takes appropriate arguments and returns the correct result.",
+    "starter": "def find_max_index(lst):\n    '''Return the index of the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-30",
+    "suite": "code-gen",
+    "prompt": "Write a function named `reverse_string` that takes appropriate arguments and returns the correct result.",
+    "starter": "def reverse_string(s):\n    '''Return the reversed string.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-31",
+    "suite": "code-gen",
+    "prompt": "Write a function named `filter_even` that takes appropriate arguments and returns the correct result.",
+    "starter": "def filter_even(lst):\n    '''Return a list of even numbers from lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-32",
+    "suite": "code-gen",
+    "prompt": "Write a function named `sum_of_squares` that takes appropriate arguments and returns the correct result.",
+    "starter": "def sum_of_squares(lst):\n    '''Return the sum of squares of elements in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-33",
+    "suite": "code-gen",
+    "prompt": "Write a function named `count_words` that takes appropriate arguments and returns the correct result.",
+    "starter": "def count_words(s):\n    '''Return the number of words in string s.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-34",
+    "suite": "code-gen",
+    "prompt": "Write a function named `max_in_list` that takes appropriate arguments and returns the correct result.",
+    "starter": "def max_in_list(lst):\n    '''Return the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-35",
+    "suite": "code-gen",
+    "prompt": "Write a function named `is_palindrome` that takes appropriate arguments and returns the correct result.",
+    "starter": "def is_palindrome(s):\n    '''Return True if s is a palindrome.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-36",
+    "suite": "code-gen",
+    "prompt": "Write a function named `factorial` that takes appropriate arguments and returns the correct result.",
+    "starter": "def factorial(n):\n    '''Return the factorial of n.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-37",
+    "suite": "code-gen",
+    "prompt": "Write a function named `fibonacci` that takes appropriate arguments and returns the correct result.",
+    "starter": "def fibonacci(n):\n    '''Return the nth Fibonacci number.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-38",
+    "suite": "code-gen",
+    "prompt": "Write a function named `dict_sum` that takes appropriate arguments and returns the correct result.",
+    "starter": "def dict_sum(d):\n    '''Return the sum of all values in dictionary d.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-39",
+    "suite": "code-gen",
+    "prompt": "Write a function named `find_max_index` that takes appropriate arguments and returns the correct result.",
+    "starter": "def find_max_index(lst):\n    '''Return the index of the maximum value in lst.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "gen-40",
+    "suite": "code-gen",
+    "prompt": "Write a function named `reverse_string` that takes appropriate arguments and returns the correct result.",
+    "starter": "def reverse_string(s):\n    '''Return the reversed string.'''\n    pass",
+    "dev": false
+  },
+  {
+    "id": "math-01",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": true
+  },
+  {
+    "id": "math-02",
+    "suite": "math",
+    "prompt": "What is 24% of 100?",
+    "starter": "What is 24% of 100?",
+    "dev": true
+  },
+  {
+    "id": "math-03",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 34",
+    "starter": "Solve for x: 3x + 7 = 34",
+    "dev": true
+  },
+  {
+    "id": "math-04",
+    "suite": "math",
+    "prompt": "GCD of 41 and 38",
+    "starter": "GCD of 41 and 38",
+    "dev": true
+  },
+  {
+    "id": "math-05",
+    "suite": "math",
+    "prompt": "27 mod 5",
+    "starter": "27 mod 5",
+    "dev": true
+  },
+  {
+    "id": "math-06",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 7 and width 18",
+    "starter": "Area of rectangle with length 7 and width 18",
+    "dev": false
+  },
+  {
+    "id": "math-07",
+    "suite": "math",
+    "prompt": "5 + 4 * 12",
+    "starter": "5 + 4 * 12",
+    "dev": false
+  },
+  {
+    "id": "math-08",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-09",
+    "suite": "math",
+    "prompt": "What is 37% of 400?",
+    "starter": "What is 37% of 400?",
+    "dev": false
+  },
+  {
+    "id": "math-10",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 46",
+    "starter": "Solve for x: 3x + 7 = 46",
+    "dev": false
+  },
+  {
+    "id": "math-11",
+    "suite": "math",
+    "prompt": "GCD of 87 and 13",
+    "starter": "GCD of 87 and 13",
+    "dev": false
+  },
+  {
+    "id": "math-12",
+    "suite": "math",
+    "prompt": "81 mod 8",
+    "starter": "81 mod 8",
+    "dev": false
+  },
+  {
+    "id": "math-13",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 18 and width 12",
+    "starter": "Area of rectangle with length 18 and width 12",
+    "dev": false
+  },
+  {
+    "id": "math-14",
+    "suite": "math",
+    "prompt": "58 + 76 * 36",
+    "starter": "58 + 76 * 36",
+    "dev": false
+  },
+  {
+    "id": "math-15",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-16",
+    "suite": "math",
+    "prompt": "What is 10% of 300?",
+    "starter": "What is 10% of 300?",
+    "dev": false
+  },
+  {
+    "id": "math-17",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 40",
+    "starter": "Solve for x: 3x + 7 = 40",
+    "dev": false
+  },
+  {
+    "id": "math-18",
+    "suite": "math",
+    "prompt": "GCD of 53 and 45",
+    "starter": "GCD of 53 and 45",
+    "dev": false
+  },
+  {
+    "id": "math-19",
+    "suite": "math",
+    "prompt": "29 mod 8",
+    "starter": "29 mod 8",
+    "dev": false
+  },
+  {
+    "id": "math-20",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 15 and width 8",
+    "starter": "Area of rectangle with length 15 and width 8",
+    "dev": false
+  },
+  {
+    "id": "math-21",
+    "suite": "math",
+    "prompt": "12 + 49 * 13",
+    "starter": "12 + 49 * 13",
+    "dev": false
+  },
+  {
+    "id": "math-22",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-23",
+    "suite": "math",
+    "prompt": "What is 55% of 600?",
+    "starter": "What is 55% of 600?",
+    "dev": false
+  },
+  {
+    "id": "math-24",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 49",
+    "starter": "Solve for x: 3x + 7 = 49",
+    "dev": false
+  },
+  {
+    "id": "math-25",
+    "suite": "math",
+    "prompt": "GCD of 43 and 15",
+    "starter": "GCD of 43 and 15",
+    "dev": false
+  },
+  {
+    "id": "math-26",
+    "suite": "math",
+    "prompt": "68 mod 19",
+    "starter": "68 mod 19",
+    "dev": false
+  },
+  {
+    "id": "math-27",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 8 and width 17",
+    "starter": "Area of rectangle with length 8 and width 17",
+    "dev": false
+  },
+  {
+    "id": "math-28",
+    "suite": "math",
+    "prompt": "11 + 71 * 38",
+    "starter": "11 + 71 * 38",
+    "dev": false
+  },
+  {
+    "id": "math-29",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-30",
+    "suite": "math",
+    "prompt": "What is 90% of 1000?",
+    "starter": "What is 90% of 1000?",
+    "dev": false
+  },
+  {
+    "id": "math-31",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 37",
+    "starter": "Solve for x: 3x + 7 = 37",
+    "dev": false
+  },
+  {
+    "id": "math-32",
+    "suite": "math",
+    "prompt": "GCD of 83 and 34",
+    "starter": "GCD of 83 and 34",
+    "dev": false
+  },
+  {
+    "id": "math-33",
+    "suite": "math",
+    "prompt": "100 mod 4",
+    "starter": "100 mod 4",
+    "dev": false
+  },
+  {
+    "id": "math-34",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 6 and width 12",
+    "starter": "Area of rectangle with length 6 and width 12",
+    "dev": false
+  },
+  {
+    "id": "math-35",
+    "suite": "math",
+    "prompt": "99 + 38 * 11",
+    "starter": "99 + 38 * 11",
+    "dev": false
+  },
+  {
+    "id": "math-36",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-37",
+    "suite": "math",
+    "prompt": "What is 39% of 200?",
+    "starter": "What is 39% of 200?",
+    "dev": false
+  },
+  {
+    "id": "math-38",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 40",
+    "starter": "Solve for x: 3x + 7 = 40",
+    "dev": false
+  },
+  {
+    "id": "math-39",
+    "suite": "math",
+    "prompt": "GCD of 45 and 68",
+    "starter": "GCD of 45 and 68",
+    "dev": false
+  },
+  {
+    "id": "math-40",
+    "suite": "math",
+    "prompt": "91 mod 13",
+    "starter": "91 mod 13",
+    "dev": false
+  },
+  {
+    "id": "math-41",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 10 and width 16",
+    "starter": "Area of rectangle with length 10 and width 16",
+    "dev": false
+  },
+  {
+    "id": "math-42",
+    "suite": "math",
+    "prompt": "46 + 27 * 86",
+    "starter": "46 + 27 * 86",
+    "dev": false
+  },
+  {
+    "id": "math-43",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-44",
+    "suite": "math",
+    "prompt": "What is 44% of 200?",
+    "starter": "What is 44% of 200?",
+    "dev": false
+  },
+  {
+    "id": "math-45",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 49",
+    "starter": "Solve for x: 3x + 7 = 49",
+    "dev": false
+  },
+  {
+    "id": "math-46",
+    "suite": "math",
+    "prompt": "GCD of 91 and 31",
+    "starter": "GCD of 91 and 31",
+    "dev": false
+  },
+  {
+    "id": "math-47",
+    "suite": "math",
+    "prompt": "78 mod 9",
+    "starter": "78 mod 9",
+    "dev": false
+  },
+  {
+    "id": "math-48",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 10 and width 19",
+    "starter": "Area of rectangle with length 10 and width 19",
+    "dev": false
+  },
+  {
+    "id": "math-49",
+    "suite": "math",
+    "prompt": "49 + 35 * 82",
+    "starter": "49 + 35 * 82",
+    "dev": false
+  },
+  {
+    "id": "math-50",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-51",
+    "suite": "math",
+    "prompt": "What is 81% of 400?",
+    "starter": "What is 81% of 400?",
+    "dev": false
+  },
+  {
+    "id": "math-52",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 52",
+    "starter": "Solve for x: 3x + 7 = 52",
+    "dev": false
+  },
+  {
+    "id": "math-53",
+    "suite": "math",
+    "prompt": "GCD of 51 and 17",
+    "starter": "GCD of 51 and 17",
+    "dev": false
+  },
+  {
+    "id": "math-54",
+    "suite": "math",
+    "prompt": "39 mod 3",
+    "starter": "39 mod 3",
+    "dev": false
+  },
+  {
+    "id": "math-55",
+    "suite": "math",
+    "prompt": "Area of rectangle with length 15 and width 17",
+    "starter": "Area of rectangle with length 15 and width 17",
+    "dev": false
+  },
+  {
+    "id": "math-56",
+    "suite": "math",
+    "prompt": "35 + 9 * 28",
+    "starter": "35 + 9 * 28",
+    "dev": false
+  },
+  {
+    "id": "math-57",
+    "suite": "math",
+    "prompt": "1/2 + 1/3 + 1/6",
+    "starter": "1/2 + 1/3 + 1/6",
+    "dev": false
+  },
+  {
+    "id": "math-58",
+    "suite": "math",
+    "prompt": "What is 82% of 600?",
+    "starter": "What is 82% of 600?",
+    "dev": false
+  },
+  {
+    "id": "math-59",
+    "suite": "math",
+    "prompt": "Solve for x: 3x + 7 = 31",
+    "starter": "Solve for x: 3x + 7 = 31",
+    "dev": false
+  },
+  {
+    "id": "math-60",
+    "suite": "math",
+    "prompt": "GCD of 93 and 73",
+    "starter": "GCD of 93 and 73",
+    "dev": false
+  }
+]

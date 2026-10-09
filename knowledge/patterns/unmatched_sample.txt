@@ -1,0 +1,60 @@
+ENG-03-006 [engineering] Roofing — Shedding water; slopes and materials
+CHEM-09-002 [chemistry] Alkanes — Single bonds; CnH2n+2
+MATH-05-003 [math] Triangles — Three‑sided polygons
+BIO-05-010 [biology] Pandemics — Global spread of new pathogens
+BIO-08-010 [biology] Sanitation — Clean water and waste separation
+PHYS-07-008 [physics] Gravitational Lensing — Deflection of light by massive objects, strong/weak regimes
+CHEM-02-002 [chemistry] Groups — Columns; elements with similar valence behavior
+MATH-01-008 [math] Roots — Inverse operation of exponentiation
+QUANT-01-006 [quantum] Quantization — Energy and angular momentum come in packets
+BIO-07-002 [biology] Muscular system — Contraction drives movement
+MATH-17-002 [math] Permutations — Ordered arrangements of n distinct items
+CODE-08-013 [coding] NewSQL and Hybrid Transactional/Analytical Processing (HTAP) — Systems combining OLTP scalability with OLAP capabilities
+BIO-04-011 [biology] Fermentation — ATP without oxygen
+CHEM-01-002 [chemistry] Protons — Positively charged nuclear particles; define the element
+MATH-08-015 [math] Resolution of singularities — Process replacing singular set with smooth one
+MATH-07-009 [math] Gaussian curvature — Product of principal curvatures
+BIO-08-006 [biology] Broken bones — Splinting and immobilization
+EARTH-01-002 [earth-science] Plate tectonics — Crust plates drift on the mantle
+CHEM-01-008 [chemistry] Electron shells — Energy levels holding 2, 8, 18... electrons
+PHYS-12-010 [physics] Nuclear Astrophysics and r‑process/s‑process — Neutron capture pathways creating heavy elements in stars
+MATH-08-003 [math] Morphisms — Polynomial maps preserving algebraic structure
+BIO-07-003 [biology] Circulatory system — Heart plus vessels move blood
+PHYS-16-003 [physics] Complex Analysis and Contour Integration — Analytic functions, residues, Cauchy’s theorem
+CHEM-05-008 [chemistry] Spontaneous vs fast — Thermodynamics says if, kinetics says how fast
+CODE-10-005 [coding] Remote Procedure Call (RPC) and gRPC — Invoking procedures on remote machines as if local
+QUANT-09-005 [quantum] String theory — Vibrating strings as fundamental objects
+QUANT-08-002 [quantum] Quantum magnetometers — Sensing fields at quantum limits
+BIO-07-007 [biology] Nervous system — Brain, spinal cord, nerves; fast signaling
+PHYS-02-016 [physics] Real Gases and Van der Waals Equation — Corrections for molecular volume and intermolecular attractions
+QUANT-01-010 [quantum] Double-slit experiment — Single particles interfere with themselves
+MATH-05-006 [math] Pythagorean theorem — a^2 + b^2 = c^2 for right triangles
+BIO-06-002 [biology] Transpiration — Water movement up through plants
+CODE-10-003 [coding] Eventual Consistency and CRDTs — Data models that converge without coordination
+BIO-05-008 [biology] Sterilization — Killing all microbes
+PHYS-14-006 [physics] Pulsars and Magnetars — Rotating neutron stars with beams, ultra‑strong B fields
+CHEM-07-002 [chemistry] Brønsted-Lowry definition — Acids donate protons, bases accept them
+EARTH-07-007 [earth-science] Solar power — Photons to electricity via panels
+MATH-07-011 [math] Geodesics — Locally shortest paths on a surface
+CHEM-08-005 [chemistry] Electrolytic cells — Electricity drives non-spontaneous redox
+PHYS-10-003 [physics] Magnetohydrodynamics (MHD) Equations — Coupled Navier‑Stokes and Maxwell’s equations for conducting fluid
+CHEM-04-010 [chemistry] Gas stoichiometry — PV = nRT links gas volume to moles
+PHYS-18-002 [physics] Enzyme Kinetics and Michaelis-Menten Model — v = Vmax[S]/(Km+[S]) describing catalytic rate
+ENG-01-010 [engineering] Springs and damping — Storing and absorbing energy
+PHYS-15-002 [physics] Hubble's Law and Cosmic Expansion — v = H₀ d, relation between recession velocity and distance
+CODE-01-010 [coding] Parallel Programming Paradigm — Executes multiple computations simultaneously on multiple cores
+CHEM-03-001 [chemistry] Ionic bonds — Electron transfer; cation plus anion lattice
+PHYS-04-019 [physics] Fiber Optics and Total Internal Reflection — Light guidance via refractive index core-cladding structure
+CODE-02-008 [coding] Binary Search Tree — Binary tree with left < parent < right ordering property
+MATH-02-001 [math] Variables and expressions — Symbols representing numbers combined with operations
+CHEM-02-005 [chemistry] Transition metals — d-block; variable oxidation states, catalysts
+PHYS-11-009 [physics] Quantum Hall Effect and Landau Levels — Quantized Hall conductance σₓy = ν e²/h in 2DEG
+BIO-07-008 [biology] Endocrine system — Hormones; slow chemical signaling
+PHYS-15-009 [physics] Gravitational Lensing in Cosmology (Strong/Weak) — Light bending by large‑scale structure, shear and magnification
+BIO-07-004 [biology] Blood — Carries O2, nutrients, immune cells
+QUANT-06-008 [quantum] Particle accelerators — Smashing particles to see inside
+CODE-06-009 [coding] Security and Protection Rings — Hardware‑enforced privilege levels isolating kernel/user
+MATH-15-012 [math] Weak solutions — Solutions satisfying integral form
+PHYS-06-009 [physics] Thomas Precession — Relativistic correction to spin precession in accelerating frames
+MATH-08-006 [math] Intersection theory — Algebraic counting of intersections
+ENG-02-005 [engineering] Lathes — Turning cylindrical parts

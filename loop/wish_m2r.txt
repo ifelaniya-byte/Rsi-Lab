@@ -1,0 +1,139 @@
+You are an expert Python programmer. This is a REVIEW AND FIX round (strike 1 under our accountability protocol): your M2 delivery has real bugs. Review each one below, fix them all, and re-emit the corrected files.
+
+OUTPUT RULES:
+- Output ONLY the corrected file contents, each preceded by `### FILE: <path>`. No explanations, no code fences — raw file contents only.
+- Under 3000 words. Python 3.11+, stdlib only.
+- Re-emit ALL SIX files (harness/gen_tasks.py, harness/families.json, loop/fitness.py, scripts/honest_eval.py, loop/tests/test_tasks.py, loop/tests/test_fitness.py), even ones you only lightly touch, so the set is consistent.
+
+## Bugs to fix
+
+### fitness.py — sample() is broken three ways
+The REAL grade.py contract (attached below) is: `--solver PATH --tasks {dev,all} [--timeout N] [--include-holdout]`, and its stdout JSON is `{"total","passed","per_suite","details":[{"task_id","passed","error"}]}`.
+1. You invented `grade.py --tasks <tempfile path>` — grade.py rejects anything but `dev`/`all`. Fix: call grade.py with `--tasks dev` (it already filters to dev tasks; no temp file needed).
+2. You passed `--no-cache`, a flag that does not exist. Fix: ADD an optional `--no-cache` argument to grade.py that forwards `use_cache=False` to `run_solver()` (signature: `run_solver(solver_path, tasks, timeout_per_task=10, use_cache=True)`). Re-emit the modified grade.py as a 7th file (`### FILE: harness/grade.py`).
+3. You parsed `data["results"][i]["id"]` — the real keys are `data["details"][i]["task_id"]`. Fix.
+
+### fitness.py — keep_decision()
+4. Suite inference via `t.startswith("repair_")` is brittle and inconsistent (your own test uses `repair-0` with a hyphen, which misclassifies as math). Fix: thread the suite through properly — change `sample()` to return `(matrix, suites)` where `suites = {task_id: suite}`, and `keep_decision(base_matrix, cand_matrix, suites)` uses it. Update the tests to match the new signature.
+5. `seed + hash(suite)` — Python's `hash()` on strings is randomized per process (PYTHONHASHSEED), so results are NOT deterministic. Fix: use a stable hash, e.g. `zlib.crc32(suite.encode())`.
+6. Remove the dead `sum_deltas = [sum(suite_deltas)]` line and its confused comment.
+
+### gen_tasks.py
+7. Only 33 families have generators; the spec requires >=40. Add at least 7 more families (any suites) with the same parameterized/bug-variant/property-test structure.
+8. `rng` is used in `main()`'s fill loop (`rng.choice(...)`) but never defined there — NameError if that path runs. Fix: define `rng = random.Random(args.seed)` at the top of `main()`.
+
+### test_tasks.py
+9. `references_pass` does NOT execute anything — the comment says "assume correctness". That is a vacuous test. Fix: actually run each reference against its tests. For code suites, import `run` from `harness/sandbox/run.py` (i.e. `sandbox/run.py`, function `run(code, tests, timeout)`, returns dict with "passed") and assert it passes; for math, assert exact match. (HARNESS_DIR in the test is `loop/tests/../../harness`; the sandbox is at `harness/../sandbox`.)
+
+### test_fitness.py
+10. Your suite-regression case uses ids `repair-0`/`gen-0` (hyphens) which the old prefix inference misclassified — with fix #4 this is moot, but make the synthetic ids match the real convention anyway.
+11. 1000 trials x 2000 bootstrap replicates is far too slow (spec: <30s). Reduce to 200 trials and 500 replicates — still statistically meaningful for the thresholds (<=5% FP, >=80% TP).
+
+### scripts/honest_eval.py
+12. Same invented `--tasks <path>` CLI — fix to `--tasks all --include-holdout`, and ADD a required `--solver PATH` argument (grade.py requires it).
+
+## Real grade.py contract (it calls run_solver internally; you do not need to change that)
+- CLI: `--solver PATH (required) --tasks {dev,all} (default all) --timeout INT (default 10) --include-holdout (flag)`
+- Stdout JSON: `{"total": int, "passed": int, "per_suite": {"code-repair": {"total","passed"}, "code-gen": {...}, "math": {...}}, "details": [{"task_id","passed","error"}], "meta": {...}}`
+- `run_solver(solver_path, tasks, timeout_per_task=10, use_cache=True)` — add the `--no-cache` flag to grade.py to pass `use_cache=False`.
+
+## Attached: current harness/grade.py (full source follows)
+import argparse
+import json
+import os
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--solver", required=True)
+    parser.add_argument("--tasks", choices=["dev", "all"], default="all")
+    parser.add_argument("--timeout", type=int, default=10)
+    parser.add_argument("--include-holdout", action="store_true",
+                        help="Grade the 25 frozen holdout tasks too. "
+                             "HONEST-EVAL ONLY: never use for loop "
+                             "keep/revert decisions.")
+    args = parser.parse_args()
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sandbox_dir = os.path.join(base_dir, "..", "sandbox")
+    sys.path.insert(0, sandbox_dir)
+    from run import run
+    from solver_runner import run_solver
+
+    with open(os.path.join(base_dir, "tasks.json")) as f:
+        tasks = json.load(f)
+    with open(os.path.join(base_dir, "solutions.json")) as f:
+        solutions = json.load(f)
+    with open(os.path.join(base_dir, "heldout.json")) as f:
+        holdout_ids = set(json.load(f)["task_ids"])
+
+    selected_tasks = tasks
+    if args.tasks == "dev":
+        selected_tasks = [t for t in tasks if t["dev"]]
+    if not args.include_holdout:
+        # The frozen holdout must NEVER influence keep/revert decisions.
+        # It is only for the separate honest evaluation.
+        selected_tasks = [t for t in selected_tasks
+                          if t["id"] not in holdout_ids]
+    
+    # Run solver in isolated process
+    answers, meta = run_solver(args.solver, selected_tasks, args.timeout)
+    
+    results = []
+    per_suite = {"code-repair": {"total": 0, "passed": 0}, "code-gen": {"total": 0, "passed": 0}, "math": {"total": 0, "passed": 0}}
+    total_passed = 0
+    
+    for task in selected_tasks:
+        task_id = task["id"]
+        suite = task["suite"]
+        solution = solutions[task_id]
+        reference = solution["reference"]
+        tests = solution["tests"]
+        
+        per_suite[suite]["total"] += 1
+
+        # Get solver's answer
+        if task_id not in answers:
+            results.append({"task_id": task_id, "passed": False, "error": "No answer from solver"})
+            continue
+        
+        answer_data = answers[task_id]
+        if "error" in answer_data:
+            results.append({"task_id": task_id, "passed": False, "error": answer_data["error"]})
+            continue
+        
+        code = answer_data.get("answer", "")
+        
+        # A non-string answer is a wrong answer
+        if not isinstance(code, str):
+            results.append({"task_id": task_id, "passed": False,
+                            "error": f"solver returned "
+                                     f"{type(code).__name__}, not str"})
+            continue
+        
+        if suite == "math":
+            passed = code.strip() == reference.strip()
+            error = None if passed else f"Expected '{reference.strip()}', got '{code.strip()}'"
+        else:
+            res = run(code, tests, args.timeout)
+            passed = res["passed"]
+            error = res["error"]
+        
+        if passed:
+            total_passed += 1
+            per_suite[suite]["passed"] += 1
+        
+        results.append({"task_id": task_id, "passed": passed, "error": error})
+    
+    output = {
+        "total": len(selected_tasks),
+        "passed": total_passed,
+        "per_suite": per_suite,
+        "details": results,
+        "meta": meta
+    }
+    
+    print(json.dumps(output))
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,39 @@
+# openrouter/free
+# role: dispatcher
+
+Here's a thinking process:
+
+1.  **Analyze User Request:**
+   - **Role:** openrouter/free dispatcher on a 19-model AI lab team
+   - **Task:** Bring back SINGLE best latest/unproven idea for recursive self-improvement
+   - **Constraints:** 
+     - Specific and actionable, not vague
+     - Prefer newer/unproven ideas over well-known ones
+     - Under 250 words
+   - **Format Exactly:**
+     IDEA: <name>
+     HOW: <mechanism in 2-3 sentences>
+     WHY: <why it might beat current approaches, 1-2 sentences>
+
+2.  **Identify Key Requirements:**
+   - Must be about recursive self-improvement (AI rewriting its own code to get smarter)
+   - Must be "latest or unproven", ideally from recent Reddit/Twitter/research chatter
+   - Must be specific and actionable
+   - Must follow the exact 3-line format
+   - Under 250 words (easy with 3 short lines)
+
+3.  **Brainstorm/Recall Recent AI Self-Improvement Ideas:**
+   - I need to think of something that feels recent, somewhat unproven, and specific.
+   - Ideas that come to mind:
+     * Meta-learning weight updates via hypernetworks
+     * "Self-referential" prompt engineering loops
+     * Gradient-based neural architecture search on own weights
+     * "Loss landscape traversal" for capability gains
+     * Token-level self-distillation with error amplification
+     * "Reflection-tuned" LoRA adapters that rewrite prompt logic
+     * Something about "cognitive synergy" between base model and fine-tuned adapter that recursively updates
+   - Let me think about what's actually been discussed recently on X/Reddit/research.
+   - There's been talk about "online self-improvement via reinforcement from verifiable rewards", "gradient flow through reasoning traces", "self-consistency as a training signal", "LLMs writing prompts for better LLMs", "meta-gradients on chain-of-thought", "self-rewarding language models" (SRLM), "RL from AI feedback (RLAIF) with self-critique", "implicit learning from model's own generated data", "distillation of reasoning traces", "adaptive compute allocation that self-modifies", "neural architecture discovered by the model itself during inference".
+   - I want something that feels like a genuine "idea" not just "RLHF". It should involve the model actively rewriting its own structure or prompts in a loop.
+   - Let me consider: "Recursive Prompt-and-Weight Co-Evolution" or "Self-Modifying LoRA via Verified Outcome Gradients".
+   - Actually, a hot topic: models

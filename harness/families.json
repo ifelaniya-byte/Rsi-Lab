@@ -1,0 +1,419 @@
+{
+  "families": [
+    {
+      "id": "code_repair_binary_search_bounds",
+      "suite": "code-repair",
+      "description": "Fix incorrect bounds updates in binary search implementation.",
+      "split": "dev",
+      "params": {"array_size": [32, 128, 512], "bug_type": ["low_high_update", "mid_calc"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_off_by_one_loop",
+      "suite": "code-repair",
+      "description": "Correct off-by-one errors in loop ranges.",
+      "split": "dev",
+      "params": {"loop_type": ["for", "while"], "direction": ["increasing", "decreasing"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_null_check",
+      "suite": "code-repair",
+      "description": "Add missing null checks for data structure access.",
+      "split": "dev",
+      "params": {"data_structure": ["list", "tree"], "missing_case": ["head", "tail"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_integer_division",
+      "suite": "code-repair",
+      "description": "Fix integer division where floating result is required.",
+      "split": "dev",
+      "params": {"language": ["python", "java"], "operation": ["average", "rate"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_string_concat",
+      "suite": "code-repair",
+      "description": "Correct string concatenation misuse in loops.",
+      "split": "dev",
+      "params": {"language": ["python", "javascript"], "method": ["plus", "join"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_recursion_basecase",
+      "suite": "code-repair",
+      "description": "Add missing base case in recursive function.",
+      "split": "holdout",
+      "params": {"function": ["factorial", "fibonacci", "gcd"], "missing_case": ["zero", "one"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_swap_variables",
+      "suite": "code-repair",
+      "description": "Fix incorrect variable swapping in algorithm.",
+      "split": "train",
+      "params": {"context": ["sort", "partition"], "bug": ["missing_temp", "wrong_index"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_stack_pop_empty",
+      "suite": "code-repair",
+      "description": "Prevent popping from empty stack.",
+      "split": "train",
+      "params": {"stack_impl": ["list", "array"], "operation": ["pop", "peek"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_sort_compare",
+      "suite": "code-repair",
+      "description": "Fix comparison logic in sorting algorithm.",
+      "split": "train",
+      "params": {"algorithm": ["quick", "merge"], "compare_bug": ["reversed", "strict"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_graph_visit",
+      "suite": "code-repair",
+      "description": "Correct visited tracking in graph traversal.",
+      "split": "holdout",
+      "params": {"graph_type": ["directed", "undirected"], "traversal": ["dfs", "bfs"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_hashmap_keyerror",
+      "suite": "code-repair",
+      "description": "Handle missing keys in hashmap lookup.",
+      "split": "train",
+      "params": {"map_type": ["dict", "defaultdict"], "missing_key": ["count", "lookup"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_modulo_negative",
+      "suite": "code-repair",
+      "description": "Fix negative modulo handling across languages.",
+      "split": "train",
+      "params": {"language": ["python", "c"], "use_case": ["wrap", "hash"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_infinite_loop",
+      "suite": "code-repair",
+      "description": "Resolve infinite loop due to missing updates.",
+      "split": "holdout",
+      "params": {"loop_kind": ["while", "for"], "termination": ["missing_update", "wrong_condition"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_path_join",
+      "suite": "code-repair",
+      "description": "Fix file path joining with incorrect separators.",
+      "split": "holdout",
+      "params": {"platform": ["posix", "windows"], "issue": ["double_sep", "missing_sep"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+    {
+      "id": "code_repair_type_cast",
+      "suite": "code-repair",
+      "description": "Correct improper type casting causing errors.",
+      "split": "train",
+      "params": {"source_type": ["string", "float"], "target_type": ["int", "bool"]},
+      "dedupe_key": ["canonical_code_hash"]
+    },
+
+    {
+      "id": "code_gen_fibonacci",
+      "suite": "code-gen",
+      "description": "Generate Fibonacci numbers up to N.",
+      "split": "dev",
+      "params": {"method": ["iterative", "recursive"], "output": ["list", "nth"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_prime_sieve",
+      "suite": "code-gen",
+      "description": "Implement Sieve of Eratosthenes for primes up to N.",
+      "split": "dev",
+      "params": {"limit": [100, 1000, 10000], "space_opt": ["basic", "bitset"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_anagram_group",
+      "suite": "code-gen",
+      "description": "Group words that are anagrams.",
+      "split": "dev",
+      "params": {"keying": ["sorted", "counting"], "case_sensitive": [true, false]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_bfs_shortest_path",
+      "suite": "code-gen",
+      "description": "Find shortest path in unweighted graph using BFS.",
+      "split": "dev",
+      "params": {"graph_repr": ["adj_list", "adj_matrix"], "return": ["length", "path"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_csv_parser",
+      "suite": "code-gen",
+      "description": "Parse CSV lines handling quoted fields.",
+      "split": "dev",
+      "params": {"delimiter": [",", ";"], "quotes": ["double", "single"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_lru_cache",
+      "suite": "code-gen",
+      "description": "Implement LRU cache with get/put operations.",
+      "split": "holdout",
+      "params": {"capacity": [2, 5, 10], "structure": ["ordered_dict", "custom_list"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_json_flatten",
+      "suite": "code-gen",
+      "description": "Flatten nested JSON into dotted-key dictionary.",
+      "split": "train",
+      "params": {"separator": [".", "_"], "list_handling": ["index", "skip"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_regex_email",
+      "suite": "code-gen",
+      "description": "Build regex to validate basic email format.",
+      "split": "train",
+      "params": {"tld_length": [2, 3], "allow_subdomain": [true, false]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_matrix_multiply",
+      "suite": "code-gen",
+      "description": "Multiply two matrices.",
+      "split": "train",
+      "params": {"size": [[2,2,2], [3,3,3]], "opt": ["naive", "transpose"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_topological_sort",
+      "suite": "code-gen",
+      "description": "Return topological order of DAG.",
+      "split": "holdout",
+      "params": {"method": ["kahn", "dfs"], "cycle_behavior": ["error", "empty"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_interval_merge",
+      "suite": "code-gen",
+      "description": "Merge overlapping intervals.",
+      "split": "train",
+      "params": {"inclusive": [true, false], "input_sorted": [true, false]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_kth_smallest",
+      "suite": "code-gen",
+      "description": "Find kth smallest element in array.",
+      "split": "train",
+      "params": {"method": ["heap", "quickselect"], "k_range": [1, 5, 10]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_trie_insert_search",
+      "suite": "code-gen",
+      "description": "Implement trie with insert and search.",
+      "split": "train",
+      "params": {"alphabet": ["lowercase", "alphanumeric"], "search": ["full", "prefix"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_palindrome_partition",
+      "suite": "code-gen",
+      "description": "Partition string into palindromic substrings.",
+      "split": "holdout",
+      "params": {"output": ["all", "min_count"], "method": ["dp", "backtrack"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+    {
+      "id": "code_gen_knapsack_dp",
+      "suite": "code-gen",
+      "description": "Solve 0/1 knapsack using dynamic programming.",
+      "split": "train",
+      "params": {"capacity": [10, 50], "return": ["value", "items"]},
+      "dedupe_key": ["spec_hash", "language"]
+    },
+
+    {
+      "id": "math_quadratic_roots",
+      "suite": "math",
+      "description": "Solve quadratic equation for real roots.",
+      "split": "dev",
+      "params": {"coeff_range": ["small", "mixed"], "discriminant": ["positive", "zero"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_linear_system_2x2",
+      "suite": "math",
+      "description": "Solve 2x2 linear system.",
+      "split": "dev",
+      "params": {"coeff_range": ["small", "mixed"], "solution_type": ["integer", "fraction"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_modular_inverse",
+      "suite": "math",
+      "description": "Compute modular inverse using extended Euclid.",
+      "split": "holdout",
+      "params": {"mod_prime": [true, false], "a_range": ["small", "large"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_combinatorics_nCr",
+      "suite": "math",
+      "description": "Compute binomial coefficient n choose r.",
+      "split": "dev",
+      "params": {"n_range": [10, 50, 100], "r_relation": ["small", "mid"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_arithmetic_series",
+      "suite": "math",
+      "description": "Sum of arithmetic series.",
+      "split": "dev",
+      "params": {"n_terms": [10, 100], "start_step": ["positive", "negative"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_geometric_series",
+      "suite": "math",
+      "description": "Sum of geometric series.",
+      "split": "dev",
+      "params": {"ratio": ["fraction", "integer"], "n_terms": [5, 20]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_probability_dice",
+      "suite": "math",
+      "description": "Compute probability of dice outcomes.",
+      "split": "train",
+      "params": {"dice": [1, 2, 3], "event": ["sum", "at_least"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_vector_dot",
+      "suite": "math",
+      "description": "Compute dot product of vectors.",
+      "split": "train",
+      "params": {"dimension": [3, 5, 10], "value_range": ["small", "mixed"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_matrix_determinant_3x3",
+      "suite": "math",
+      "description": "Compute determinant of 3x3 matrix.",
+      "split": "train",
+      "params": {"value_range": ["small", "mixed"], "zero_rows": [true, false]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_log_exponent",
+      "suite": "math",
+      "description": "Solve basic logarithm or exponent expression.",
+      "split": "train",
+      "params": {"base": [2, 10, "e"], "form": ["log", "exp"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_integral_polynomial",
+      "suite": "math",
+      "description": "Compute definite integral of polynomial.",
+      "split": "holdout",
+      "params": {"degree": [2, 3, 4], "bounds": ["small", "mixed"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_derivative_trig",
+      "suite": "math",
+      "description": "Compute derivative of simple trigonometric function.",
+      "split": "train",
+      "params": {"function": ["sin", "cos", "tan"], "coeff": ["unit", "scalar"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_complex_magnitude",
+      "suite": "math",
+      "description": "Compute magnitude of complex number.",
+      "split": "train",
+      "params": {"value_range": ["small", "mixed"], "format": ["a+bi", "pair"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_statistics_mean_variance",
+      "suite": "math",
+      "description": "Compute mean and variance of dataset.",
+      "split": "holdout",
+      "params": {"size": [5, 20], "variance_type": ["population", "sample"]},
+      "dedupe_key": ["problem_hash"]
+    },
+    {
+      "id": "math_number_theory_gcd_lcm",
+      "suite": "math",
+      "description": "Compute gcd and lcm of two integers.",
+      "split": "train",
+      "params": {"value_range": ["small", "large"], "signs": ["positive", "mixed"]},
+      "dedupe_key": ["problem_hash"]
+    }
+  ],
+  "splits": {
+    "dev": [
+      "code_repair_binary_search_bounds",
+      "code_repair_off_by_one_loop",
+      "code_repair_null_check",
+      "code_repair_integer_division",
+      "code_repair_string_concat",
+      "code_gen_fibonacci",
+      "code_gen_prime_sieve",
+      "code_gen_anagram_group",
+      "code_gen_bfs_shortest_path",
+      "code_gen_csv_parser",
+      "math_quadratic_roots",
+      "math_linear_system_2x2",
+      "math_combinatorics_nCr",
+      "math_arithmetic_series",
+      "math_geometric_series"
+    ],
+    "train": [
+      "code_repair_swap_variables",
+      "code_repair_stack_pop_empty",
+      "code_repair_sort_compare",
+      "code_repair_hashmap_keyerror",
+      "code_repair_modulo_negative",
+      "code_repair_type_cast",
+      "code_gen_json_flatten",
+      "code_gen_regex_email",
+      "code_gen_matrix_multiply",
+      "code_gen_interval_merge",
+      "code_gen_kth_smallest",
+      "code_gen_trie_insert_search",
+      "code_gen_knapsack_dp",
+      "math_probability_dice",
+      "math_vector_dot",
+      "math_matrix_determinant_3x3",
+      "math_log_exponent",
+      "math_derivative_trig",
+      "math_complex_magnitude",
+      "math_number_theory_gcd_lcm"
+    ],
+    "holdout": [
+      "code_repair_recursion_basecase",
+      "code_repair_graph_visit",
+      "code_repair_infinite_loop",
+      "code_repair_path_join",
+      "code_gen_lru_cache",
+      "code_gen_topological_sort",
+      "code_gen_palindrome_partition",
+      "math_modular_inverse",
+      "math_integral_polynomial",
+      "math_statistics_mean_variance"
+    ]
+  }
+}

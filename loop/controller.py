@@ -1,0 +1,794 @@
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import urllib.request
+from datetime import datetime, timezone
+import uuid
+
+# Configuration
+LOOP_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(LOOP_DIR)
+GRADE_PY = os.path.join(BASE_DIR, "harness", "grade.py")
+
+# Import config and llm
+from loop import config
+from loop import llm
+
+LOG_FILE = config.LOG_FILE
+
+# Model IDs from environment (must be free models on OpenRouter)
+ORCHESTRATOR_MODEL = os.getenv("ORCHESTRATOR_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free")
+CODER_MODEL = os.getenv("CODER_MODEL", "poolside/laguna-s-2.1:free")
+# NOTE 2026-10-09: Inkling returns HTTP 403 on the free tier, so the critic
+# seat is temporarily held by cohere/north-mini-code until Inkling works again.
+CRITIC_MODEL = os.getenv("CRITIC_MODEL", "cohere/north-mini-code:free")
+SAFETY_MODEL = os.getenv("SAFETY_MODEL", "nvidia/nemotron-3.5-content-safety:free")
+HISTORIAN_MODEL = os.getenv("HISTORIAN_MODEL", "dots-studio/dots-3-note-preview:free")
+# The scoreboard leader reviews every plan before implementation.
+LEADER_MODEL = os.getenv("LEADER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+
+# Seat cascades: if a seat's primary model flakes (empty/connection/403),
+# fall through to the next. No single flaky model stalls a seat.
+# (Triple sweep #2, 2026-10-09: coder calls were dying on laguna-s.)
+_SEAT_CASCADES = {
+    "poolside/laguna-s-2.1:free": [
+        "poolside/laguna-s-2.1:free",
+        "cohere/north-mini-code:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "poolside/laguna-xs-2.1:free": [
+        "poolside/laguna-xs-2.1:free",
+        "cohere/north-mini-code:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "nvidia/nemotron-3.5-content-safety:free": [
+        "nvidia/nemotron-3.5-content-safety:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "dots-studio/dots-3-note-preview:free": [
+        "dots-studio/dots-3-note-preview:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "nvidia/nemotron-3-ultra-550b-a55b:free": [
+        "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "cohere/north-mini-code:free": [
+        "cohere/north-mini-code:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"],
+    "nvidia/nemotron-3-super-120b-a12b:free": [
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "cohere/north-mini-code:free"],
+}
+
+
+def _seat_cascade(model_id):
+    base = _SEAT_CASCADES.get(model_id, [model_id])
+    # Last resort: the cheap paid model. Keeps the loop alive during
+    # free-tier outages for ~$0.03/1M tokens (a generation's seat calls
+    # cost a fraction of a cent). Imported lazily to avoid cycles.
+    try:
+        from call_log import FALLBACK_MODEL
+        if FALLBACK_MODEL not in base:
+            return base + [FALLBACK_MODEL]
+    except Exception:
+        pass
+    return base
+
+def load_seat_prompt(name):
+    """Load a seat prompt template from prompts/<name>.md."""
+    path = os.path.join(LOOP_DIR, "prompts", f"{name}.md")
+    try:
+        with open(path) as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+def log_event(event, detail, score=None):
+    """Append one JSON line to the loop log.
+
+    Schema: {"ts","gen","event","detail"} + optional "score".
+    detail must be ONE plain sentence (string), score is a dict of percentages.
+    """
+    if not isinstance(detail, str):
+        detail = json.dumps(detail)
+    log_entry = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "gen": getattr(log_event, "current_gen", 0),
+        "event": event,
+        "detail": detail,
+    }
+    if score is not None:
+        log_entry["score"] = score
+    with open(LOG_FILE, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+def call_model(model_id, prompt, purpose="loop:call", collective=False):
+    """Delegate to llm module."""
+    return llm.get_llm().call(model_id, prompt, purpose, collective)
+
+def write_traj(traj):
+    """Append one proposal trajectory as future fine-tuning data."""
+    tdir = os.path.join(LOOP_DIR, "trajectories")
+    os.makedirs(tdir, exist_ok=True)
+    traj["ts_end"] = datetime.now(timezone.utc).isoformat()
+    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with open(os.path.join(tdir, day + ".jsonl"), "a") as f:
+        f.write(json.dumps(traj) + "\n")
+    # Circuit breaker: a stuck loop ends itself instead of burning calls.
+    # 6 consecutive reverts with nothing kept means the loop isn't learning.
+    if traj.get("outcome") == "kept":
+        write_traj.consecutive_reverts = 0
+    elif traj.get("outcome") == "reverted":
+        write_traj.consecutive_reverts = getattr(
+            write_traj, "consecutive_reverts", 0) + 1
+    # The historian's job: every proposal becomes a notebook finding, kept
+    # or reverted, so the collective learns from failures too.
+    try:
+        sys.path.insert(0, LOOP_DIR)
+        from notebook import record_finding
+        record_finding(traj)
+    except Exception:
+        pass
+
+def grade_solver(solver_path, dev_only=False):
+    """Grade a solver and return score percentages per suite + total."""
+    tasks = "dev" if dev_only else "all"
+    cmd = [sys.executable, GRADE_PY, "--solver", solver_path, "--tasks", tasks]
+    # Token accounting: sum loop:solver tokens logged during this grading run.
+    sys.path.insert(0, "/home/hatch/workspace/skills/openrouter/bin")
+    from call_log import _day_file
+    log_path = _day_file()
+    try:
+        log_before = os.path.getsize(log_path)
+    except OSError:
+        log_before = 0
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True,
+                                cwd=os.path.dirname(solver_path), timeout=600)
+        if result.returncode != 0:
+            return {"total": 0.0, "code_repair": 0.0, "code_gen": 0.0,
+                    "math": 0.0, "_error": result.stderr[-500:]}
+        data = json.loads(result.stdout.strip())
+
+        def pct(suite):
+            s = data.get("per_suite", {}).get(suite, {})
+            t = s.get("total", 0)
+            return round(100.0 * s.get("passed", 0) / t, 1) if t else 0.0
+
+        total = data.get("total", 0)
+        tokens = 0
+        try:
+            with open(log_path, "rb") as f:
+                f.seek(log_before)
+                for line in f:
+                    try:
+                        r = json.loads(line)
+                    except Exception:
+                        continue
+                    if r.get("purpose") == "loop:solver":
+                        # CACHE HIT records carry the original token cost so
+                        # efficiency comparisons stay honest across cached runs.
+                        tokens += (r.get("prompt_tokens") or 0) + (
+                            r.get("completion_tokens") or 0)
+        except Exception:
+            pass
+        return {
+            "total": round(100.0 * data.get("passed", 0) / total, 1) if total else 0.0,
+            "code_repair": pct("code-repair"),
+            "code_gen": pct("code-gen"),
+            "math": pct("math"),
+            "_tasks": total,
+            "_tokens": tokens,
+        }
+    except Exception as e:
+        return {"total": 0.0, "code_repair": 0.0, "code_gen": 0.0,
+                "math": 0.0, "_error": str(e)[:500]}
+
+ALLOWED_PREFIXES = ("solver.py", "prompts/")
+
+def normalize_diff_path(path):
+    """Strip git-style a/ b/ prefixes and ./ so the allowlist check is sound.
+
+    Returns None for /dev/null (file creation/deletion side). Collapses
+    ".." so "prompts/../../evil.py" can never pass as prompts/.
+    """
+    path = path.strip().strip('"').strip("'")
+    if path in ("/dev/null", ""):
+        return None
+    for prefix in ("a/", "b/", "./"):
+        if path.startswith(prefix):
+            path = path[len(prefix):]
+            break
+    return os.path.normpath(path)
+
+def diff_touches_forbidden(diff_text):
+    """True if the diff touches anything outside solver.py and prompts/."""
+    for line in diff_text.split("\n"):
+        if line.startswith("+++ ") or line.startswith("--- "):
+            path = normalize_diff_path(line[4:])
+            if path is None:
+                continue  # /dev/null side of a creation/deletion
+            if path.startswith("..") or os.path.isabs(path):
+                return True, path  # path traversal escape attempt
+            # Exact match for solver.py ("solver.py.bak" must not pass);
+            # prefix match only for the prompts/ directory.
+            if not (path == "solver.py" or path.startswith("prompts/")):
+                return True, path
+    return False, None
+
+
+# M1 (2026-10-09): solve() now runs in a bubblewrap sandbox (one process per
+# task, nobody uid, /home unmounted except explicit binds). The answer key
+# is unreachable inside the sandbox (verified by test_solver_isolation.py:
+# absolute-path and obfuscated reads both fail). The diff gate below stays
+# as defense-in-depth — legitimate solver code never needs these strings.
+_CHEAT_PATTERNS = ("solutions.json", "solutions", "heldout.json",
+                   "reference", "answer key", "answer_key")
+
+
+def diff_reaches_answer_key(diff_text):
+    """True if added lines reference the answer key (cheat attempt)."""
+    for line in diff_text.split("\n"):
+        if not line.startswith("+") or line.startswith("+++"):
+            continue
+        low = line[1:].lower()
+        if any(p in low for p in _CHEAT_PATTERNS):
+            # Allow the word "solutions" in comments about the approach,
+            # but never a file read of the key.
+            if "solutions.json" in low or "heldout.json" in low:
+                return True, line.strip()[:100]
+    return False, None
+
+def apply_diff(base_dir, diff_text):
+    """Apply a unified diff inside base_dir. Returns (success, error_msg)."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".diff", delete=False) as f:
+        f.write(diff_text)
+        diff_file = f.name
+    try:
+        result = subprocess.run(
+            ["patch", "-p1", "-N", "-i", diff_file],
+            cwd=base_dir, capture_output=True, text=True, timeout=60,
+        )
+        # -p1 failed? try -p0 for non-git-style diffs
+        if result.returncode != 0:
+            result = subprocess.run(
+                ["patch", "-p0", "-N", "-i", diff_file],
+                cwd=base_dir, capture_output=True, text=True, timeout=60,
+            )
+        if result.returncode != 0:
+            return False, (result.stderr or result.stdout)[-500:]
+        return True, ""
+    except Exception as e:
+        return False, str(e)[:500]
+    finally:
+        os.unlink(diff_file)
+
+def get_file_states(scratch_dir):
+    """Get current state of solver.py and prompts/ as strings."""
+    states = {}
+    # solver.py
+    solver_path = os.path.join(scratch_dir, "solver.py")
+    if os.path.exists(solver_path):
+        with open(solver_path, "r") as f:
+            states["solver.py"] = f.read()
+    # prompts/
+    prompts_dir = os.path.join(scratch_dir, "prompts")
+    if os.path.exists(prompts_dir):
+        for root, _, files in os.walk(prompts_dir):
+            for file in files:
+                if file.endswith(".md"):
+                    rel_path = os.path.relpath(os.path.join(root, file), scratch_dir)
+                    with open(os.path.join(root, file), "r") as f:
+                        states[rel_path] = f.read()
+    return states
+
+def propose_changes(scratch_dir, seat_prompt):
+    """Get proposals from orchestrator model."""
+    solver_path = os.path.join(scratch_dir, "solver.py")
+    with open(solver_path, "r") as f:
+        solver_code = f.read()
+
+    # The lab notebook: lessons from every past proposal, so the collective
+    # doesn't repeat failed directions.
+    try:
+        sys.path.insert(0, LOOP_DIR)
+        from notebook import digest as _nb_digest
+        nb_context = _nb_digest()
+    except Exception:
+        nb_context = ""
+
+    prompts_content = ""
+    prompts_dir = os.path.join(scratch_dir, "prompts")
+    if os.path.exists(prompts_dir):
+        for root, _, files in os.walk(prompts_dir):
+            for file in files:
+                if file.endswith(".md"):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, "r") as f:
+                        prompts_content += f"=== {file} ===\n{f.read()}\n\n"
+    
+    # Substitute the template's placeholders so the model sees the real
+    # code, not literal {{...}} text (the old code sent both the raw
+    # template AND a duplicate copy of the code — wasted tokens).
+    seat_prompt = seat_prompt.replace("{{solver_code}}", solver_code).replace(
+        "{{prompts_content}}", prompts_content)
+    prompt = f"""{seat_prompt}
+
+{nb_context}
+Based on the harness scoring criteria and common failure modes, propose specific changes to solver.py or any prompt file. For each proposal, specify:
+1. What to change (file and exact location or description)
+2. Why this change should raise the harness score (referencing specific weaknesses)
+
+Format each proposal as:
+PROPOSAL:
+[description of change]
+WHY:
+[reasoning]
+
+Limit to 3 proposals. Focus on high-impact, feasible changes."""
+    
+    response = call_model(ORCHESTRATOR_MODEL, prompt, purpose="loop:orchestrator", collective=True)
+    proposals = []
+    current = {}
+    in_proposal = False
+    in_why = False
+    for line in response.split('\n'):
+        if line.startswith("PROPOSAL:"):
+            if current:
+                proposals.append(current)
+            current = {"description": line[len("PROPOSAL:"):].strip()}
+            in_proposal = True
+            in_why = False
+        elif line.startswith("WHY:"):
+            current["why"] = line[len("WHY:"):].strip()
+            in_why = True
+            in_proposal = False
+        elif in_proposal:
+            current["description"] += "\n" + line
+        elif in_why:
+            current["why"] += "\n" + line
+    if current:
+        proposals.append(current)
+    return proposals[:3]
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--generations", type=int, required=True, help="Number of generations to run")
+    parser.add_argument("--dev", action="store_true", help="Grade on dev tasks only")
+    args = parser.parse_args()
+
+    # Ensure log directory exists
+    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+
+    seat = {name: load_seat_prompt(name) for name in
+            ("orchestrator", "coder", "critic", "safety", "historian", "leader")}
+
+    for gen in range(1, args.generations + 1):
+        log_event.current_gen = gen
+        log_event("milestone", f"Starting generation {gen}.")
+
+        # Create scratch directory
+        scratch_dir = tempfile.mkdtemp(prefix=f"loop_gen{gen}_")
+        try:
+            # Copy current solver and prompts
+            shutil.copy(os.path.join(LOOP_DIR, "solver.py"),
+                        os.path.join(scratch_dir, "solver.py"))
+            shutil.copytree(os.path.join(LOOP_DIR, "prompts"),
+                            os.path.join(scratch_dir, "prompts"))
+
+            # Get baseline score
+            solver_path = os.path.join(scratch_dir, "solver.py")
+            baseline_score = grade_solver(solver_path, args.dev)
+            log_event("result", f"Baseline harness score for generation {gen}.",
+                      score=baseline_score)
+
+            current_score = baseline_score["total"]
+            # Saturation: at ~100% no accuracy gain is possible, so the game
+            # becomes unwinnable and every proposal gets denied. Switch to
+            # efficiency mode — keep changes that hold the score with fewer
+            # tokens. There is always a cheaper way to be right.
+            best_tokens = baseline_score.get("_tokens", 0)
+            efficiency_mode = baseline_score["total"] >= 99.9
+            if efficiency_mode:
+                log_event("milestone",
+                          f"Dev set saturated at {baseline_score['total']}% — "
+                          f"efficiency mode: keeping changes that hold the score "
+                          f"with fewer tokens (baseline {best_tokens} tokens).")
+
+            # Baseline file states for the leader's review step
+            file_states0 = get_file_states(scratch_dir)
+
+            # Get proposals
+            proposals = propose_changes(scratch_dir, seat["orchestrator"])
+            prop_summary = "; ".join(
+                p.get("description", "")[:120] for p in proposals) or "none"
+            log_event("propose",
+                      f"Orchestrator proposed {len(proposals)} changes: {prop_summary}.")
+
+            kept_diffs = []
+
+            _breaker_tripped = False
+            for i, proposal in enumerate(proposals):
+                # Circuit breaker: stop burning calls when nothing is learning.
+                if getattr(write_traj, "consecutive_reverts", 0) >= 6:
+                    log_event("milestone",
+                              "Stopping the run: 6 proposals reverted in a row "
+                              "with nothing kept — the loop is stuck, not "
+                              "learning. Ending early to save calls.")
+                    _breaker_tripped = True
+                    break
+                # Leader reviews and corrects every plan before implementation.
+                # It also gets the notebook so it doesn't re-bless failed ideas.
+                try:
+                    from notebook import digest as _nb_digest2
+                    _nb = _nb_digest2()
+                except Exception:
+                    _nb = ""
+                leader_prompt = seat["leader"].replace(
+                    "{{solver_code}}", file_states0.get("solver.py", "")).replace(
+                    "{{proposal}}", proposal.get("description", ""))
+                leader_prompt = _nb + "\n" + leader_prompt
+                reviewed = call_model(LEADER_MODEL, leader_prompt,
+                                      purpose="loop:leader", collective=True)
+                if reviewed.startswith("ERROR:"):
+                    log_event("revert",
+                              f"Proposal {i} discarded: the leader review call "
+                              f"failed ({reviewed[7:150]}).")
+                    write_traj({"gen": gen, "proposal_idx": i,
+                                "proposal_original": proposal.get("description", ""),
+                                "outcome": "reverted", "reason": "leader call failed"})
+                    continue
+                if reviewed.strip().startswith("REJECT:"):
+                    log_event("revert",
+                              f"Proposal {i} rejected by the leader: "
+                              f"{reviewed.strip()[7:150]}.")
+                    write_traj({"gen": gen, "proposal_idx": i,
+                                "proposal_original": proposal.get("description", ""),
+                                "proposal_leader": reviewed.strip(),
+                                "outcome": "reverted", "reason": "leader rejected"})
+                    continue
+                proposal = {"description": reviewed.strip()}
+                traj = {"gen": gen, "proposal_idx": i,
+                        "proposal_original": proposals[i].get("description", ""),
+                        "proposal_leader": proposal["description"],
+                        "diff": None, "score_before": current_score,
+                        "score_after": None, "outcome": None, "reason": None}
+                log_event("implement",
+                          f"Leader corrected proposal {i}; coder is turning "
+                          f"it into a diff: "
+                          f"{proposal.get('description', '')[:150]}.")
+
+
+                file_states = get_file_states(scratch_dir)
+                file_states_str = "\n\n".join(
+                    f"=== {fname} ===\n{content}"
+                    for fname, content in file_states.items()
+                )
+                coder_template = seat["coder"].replace(
+                    "{{proposal}}", proposal["description"]).replace(
+                    "{{file_states}}", file_states_str)
+                coder_prompt = f"""{coder_template}
+
+{_nb}
+Generate a unified diff (git-style, with a/ b/ prefixes) that implements the
+proposal. Only touch solver.py and files under prompts/. Only output the diff,
+no extra text."""
+
+                diff_text = call_model(CODER_MODEL, coder_prompt, purpose="loop:coder", collective=True)
+                if diff_text.startswith("ERROR:"):
+                    log_event("revert",
+                              f"Proposal {i} discarded: the coder call failed "
+                              f"({diff_text[7:150]}).")
+                    traj["outcome"] = "reverted"; traj["reason"] = "coder call failed"; write_traj(traj)
+                    continue
+
+                traj["diff"] = diff_text
+                forbidden, bad_path = diff_touches_forbidden(diff_text)
+                if forbidden:
+                    log_event("safety_block",
+                              f"Proposal {i} blocked: the diff touched a forbidden "
+                              f"path ({bad_path}). Only solver.py and prompts/ may change.")
+                    traj["outcome"] = "reverted"; traj["reason"] = "safety_block: forbidden path"; write_traj(traj)
+                    continue
+
+                # CHEAT GATE (2026-10-09): the solver runs in-process with
+                # the grader's privileges. Any diff reaching for the answer
+                # key is a cheat attempt — block before it ever executes.
+                cheat, cheat_line = diff_reaches_answer_key(diff_text)
+                if cheat:
+                    log_event("safety_block",
+                              f"Proposal {i} blocked: answer-key cheat attempt "
+                              f"({cheat_line}).")
+                    traj["outcome"] = "reverted"; traj["reason"] = "safety_block: answer-key cheat"; write_traj(traj)
+                    continue
+
+                # Apply diff to a temporary copy for testing
+                test_dir = tempfile.mkdtemp(prefix=f"test_gen{gen}_prop{i}_")
+                try:
+                    shutil.copytree(scratch_dir, test_dir, dirs_exist_ok=True)
+                    test_solver = os.path.join(test_dir, "solver.py")
+
+                    success, error = apply_diff(test_dir, diff_text)
+                    if not success:
+                        # AUTO-DEBUG: one bounded repair attempt before
+                        # giving up on the proposal.
+                        from autodebug import attempt_diff_repair
+                        _fixed, _ep = attempt_diff_repair(
+                            diff_text, error, scratch_dir, seat["coder"],
+                            lambda p: call_model(
+                                CODER_MODEL, p, purpose="loop:autodebug",
+                                collective=True),
+                            gen=gen, proposal_idx=i)
+                        traj.setdefault("debug_episodes", []).append(_ep)
+                        if _fixed is not None:
+                            diff_text = _fixed
+                            traj["diff"] = diff_text
+                            # Rebuild from pristine base: the failed attempt
+                            # may have partially applied.
+                            shutil.rmtree(test_dir, ignore_errors=True)
+                            test_dir = tempfile.mkdtemp(
+                                prefix=f"testfix_gen{gen}_prop{i}_")
+                            shutil.copytree(scratch_dir, test_dir,
+                                            dirs_exist_ok=True)
+                            success, error = apply_diff(test_dir, diff_text)
+                            if success:
+                                log_event("implement",
+                                          f"Proposal {i}: auto-debug repaired "
+                                          f"the broken diff; re-testing.")
+                    if not success:
+                        log_event("revert",
+                                  f"Proposal {i} discarded: the diff did not apply "
+                                  f"cleanly ({error[:150]}).")
+                        traj["outcome"] = "reverted"; traj["reason"] = "diff did not apply"; write_traj(traj)
+                        continue
+
+                    log_event("test",
+                              f"Testing proposal {i} against the harness in the sandbox.")
+                    test_score = grade_solver(test_solver, args.dev)
+                    if "_error" in test_score:
+                        # AUTO-DEBUG: the patched solver crashed in grading.
+                        # One bounded repair attempt before judging the idea.
+                        from autodebug import attempt_solver_repair
+                        _sfix, _sep = attempt_solver_repair(
+                            test_solver, test_score["_error"], seat["coder"],
+                            lambda p: call_model(
+                                CODER_MODEL, p, purpose="loop:autodebug",
+                                collective=True),
+                            gen=gen, proposal_idx=i)
+                        traj.setdefault("debug_episodes", []).append(_sep)
+                        if _sfix is not None:
+                            _sok, _serr = apply_diff(test_dir, _sfix)
+                            if _sok:
+                                log_event("implement",
+                                          f"Proposal {i}: auto-debug repaired "
+                                          f"the crashing solver; re-grading.")
+                                test_score = grade_solver(test_solver, args.dev)
+                                # Close the loop: the repair is VERIFIED only
+                                # if the solver survives re-grade. A fix that
+                                # still crashes teaches "failed", not "FIXED".
+                                from autodebug import record_verification
+                                _verified = "_error" not in test_score
+                                record_verification(
+                                    _sep, _verified,
+                                    f"re-grade {'clean' if _verified else 'still crashing'}; "
+                                    f"score {test_score.get('total', '?')}%")
+                                # The kept change is the proposal plus its fix;
+                                # patch applies multi-file diffs sequentially.
+                                diff_text = diff_text.rstrip() + "\n" + _sfix
+                                traj["diff"] = diff_text
+                            else:
+                                log_event("revert",
+                                          f"Proposal {i} discarded: auto-debug "
+                                          f"fix did not apply ({_serr[:120]}).")
+                                traj["outcome"] = "reverted"
+                                traj["reason"] = "auto-debug fix did not apply"
+                                write_traj(traj)
+                                continue
+                    log_event("result",
+                              f"Proposal {i} scored {test_score['total']}% total "
+                              f"(baseline was {current_score}%).",
+                              score=test_score)
+
+                    # Keep rule with noise margin: the solver calls a live model,
+                    # so scores wobble between runs. Require at least one full
+                    # task of genuine improvement before keeping a change.
+                    # In efficiency mode (saturated dev set) the rule becomes:
+                    # hold the score with strictly fewer tokens.
+                    traj["score_after"] = test_score["total"]
+                    tasks_n = test_score.get("_tasks", 0) or 1
+                    gained = ((test_score["total"] - current_score)
+                              * tasks_n / 100.0)
+                    if efficiency_mode:
+                        tok = test_score.get("_tokens", 0)
+                        traj["_tokens"] = tok
+                        if not (test_score["total"] >= current_score
+                                and 0 < tok < best_tokens):
+                            log_event("revert",
+                                      f"Proposal {i} discarded in efficiency mode: "
+                                      f"score {test_score['total']}% vs "
+                                      f"{current_score}%, tokens {tok} vs best "
+                                      f"{best_tokens}.")
+                            traj["outcome"] = "reverted"
+                            traj["reason"] = "no efficiency gain"
+                            write_traj(traj)
+                            continue
+                    elif gained < 1.0:
+                        log_event("revert",
+                                  f"Proposal {i} discarded: gained {gained:.1f} "
+                                  f"tasks, need at least 1 full task of real "
+                                  f"improvement (scores wobble between runs).")
+                        traj["outcome"] = "reverted"; traj["reason"] = "no real improvement"; write_traj(traj)
+                        continue
+
+                    # THE ASCENT: the keep/revert decision climbs a ladder of free
+                    # intelligences. Each rung debates the lower rungs' verdicts;
+                    # hard safety/cheating vetoes stop the climb; the top 2
+                    # judges decide unanimously. Full transcript -> journal.
+                    sys.path.insert(0, LOOP_DIR)
+                    from ascent import ascend, write_journal
+                    _ctx = (f"proposal {i} scored {test_score['total']}% "
+                            f"(baseline {current_score}%)"
+                            + (" — efficiency mode" if efficiency_mode else ""))
+                    _revised_once = False
+                    while True:
+                        _verdict, _kind, _reason, _transcript = ascend(
+                            diff_text, context=_ctx,
+                            purpose=f"loop:ascent/gen{gen}/p{i}",
+                            call_fn=llm.ascent_call_fn())
+                        write_journal(gen, i,
+                                      proposal.get("description", "")[:120],
+                                      _ctx, _verdict, _kind, _reason,
+                                      _transcript)
+                        traj["ascent"] = [
+                            {"rung": t["rung"], "api": t["api"],
+                             "verdict": t["verdict"],
+                             "reason": t.get("reason", "")[:160]}
+                            for t in _transcript]
+                        if _verdict == "REVISE" and not _revised_once:
+                            _revised_once = True
+                            log_event("implement",
+                                      f"Proposal {i}: judges request one revision: "
+                                      f"{_reason[:150]}")
+                            _revise_prompt = (
+                                f"{seat['coder']}\n\nRevise the diff below to "
+                                f"address the judges' amendments. Output only "
+                                f"the revised unified diff, no extra text.\n\n"
+                                f"Amendments: {_reason}\n\nDiff:\n{diff_text}")
+                            _revised = call_model(
+                                CODER_MODEL, _revise_prompt,
+                                purpose="loop:coder-revise", collective=True)
+                            if _revised.startswith("ERROR:"):
+                                _verdict, _kind, _reason = (
+                                    "REJECT", "quality",
+                                    "revision call failed: " + _revised[7:120])
+                                break
+                            # The revision is a brand-new diff: it must pass
+                            # the same allowlist gate as the original.
+                            _forbidden, _bad = diff_touches_forbidden(_revised)
+                            if _forbidden:
+                                _verdict, _kind, _reason = (
+                                    "REJECT", "safety",
+                                    "revised diff touched a forbidden path "
+                                    f"({_bad})")
+                                break
+                            _cheat, _cline = diff_reaches_answer_key(_revised)
+                            if _cheat:
+                                _verdict, _kind, _reason = (
+                                    "REJECT", "cheat",
+                                    "revised diff reaches for the answer key "
+                                    f"({_cline})")
+                                break
+                            _tdir2 = tempfile.mkdtemp(
+                                prefix=f"testrev_gen{gen}_prop{i}_")
+                            try:
+                                shutil.copytree(scratch_dir, _tdir2,
+                                                dirs_exist_ok=True)
+                                _ok2, _err2 = apply_diff(
+                                    _tdir2, _revised)
+                                if not _ok2:
+                                    _verdict, _kind, _reason = (
+                                        "REJECT", "quality",
+                                        "revised diff did not apply: "
+                                        + _err2[:120])
+                                    break
+                                _new_score = grade_solver(
+                                    os.path.join(_tdir2, "solver.py"),
+                                    args.dev)
+                                _tok2 = _new_score.get("_tokens", 0)
+                                if efficiency_mode:
+                                    _gate_ok = (
+                                        _new_score["total"] >= current_score
+                                        and 0 < _tok2 < best_tokens)
+                                else:
+                                    _tasks2 = (_new_score.get("_tasks", 0)
+                                               or 1)
+                                    _gate_ok = (
+                                        (_new_score["total"] - current_score)
+                                        * _tasks2 / 100.0) >= 1.0
+                                if not _gate_ok:
+                                    _verdict, _kind, _reason = (
+                                        "REJECT", "quality",
+                                        f"revised diff failed the keep gate "
+                                        f"(score {_new_score['total']}%, "
+                                        f"tokens {_tok2})")
+                                    break
+                                diff_text = _revised
+                                test_score = _new_score
+                                traj["diff"] = diff_text
+                                traj["score_after"] = test_score["total"]
+                                traj["_tokens"] = _tok2
+                                _ctx += " (revised per judges' amendments)"
+                                continue  # re-ascend the revised diff
+                            finally:
+                                shutil.rmtree(_tdir2, ignore_errors=True)
+                        break
+                    if _verdict != "APPROVE":
+                        if _kind == "safety":
+                            log_event("safety_block",
+                                      f"Proposal {i} blocked by the ascent: "
+                                      f"{_reason[:200]}.")
+                            traj["reason"] = "safety_block: " + _reason[:160]
+                        elif _kind == "cheat":
+                            log_event("cheat_flag",
+                                      f"Proposal {i} flagged by the ascent: "
+                                      f"{_reason[:200]}.")
+                            traj["reason"] = "cheat_flag: " + _reason[:160]
+                        else:
+                            log_event("revert",
+                                      f"Proposal {i} rejected by the ascent "
+                                      f"({_kind}): {_reason[:200]}.")
+                            traj["reason"] = "ascent rejected: " + _reason[:160]
+                        traj["outcome"] = "reverted"
+                        write_traj(traj)
+                        continue
+
+                    # All checks passed: keep the diff in the scratch state
+                    success, error = apply_diff(scratch_dir, diff_text)
+                    if not success:
+                        log_event("revert",
+                                  f"Proposal {i} discarded: could not apply the "
+                                  f"kept diff ({error[:150]}).")
+                        traj["outcome"] = "reverted"; traj["reason"] = "kept diff would not apply"; write_traj(traj)
+                        continue
+
+                    current_score = test_score["total"]
+                    prev_best = best_tokens
+                    if efficiency_mode:
+                        best_tokens = test_score.get("_tokens", 0) or best_tokens
+                    kept_diffs.append((i, diff_text, test_score))
+                    traj["diff"] = diff_text
+                    traj["score_after"] = test_score["total"]
+                    traj["suites_after"] = {k: v for k, v in test_score.items() if not k.startswith("_")}
+                    traj["outcome"] = "kept"; traj["reason"] = "passed all gates"
+                    write_traj(traj)
+                    log_event("keep",
+                              f"Kept proposal {i}: score {test_score['total']}%"
+                              + (f", tokens {test_score.get('_tokens', 0)} "
+                                 f"(was {prev_best})." if efficiency_mode
+                                 else f" (rose to {test_score['total']}%)."),
+                              score=test_score)
+                finally:
+                    shutil.rmtree(test_dir, ignore_errors=True)
+
+            if _breaker_tripped:
+                break  # out of the generation loop; the run ends itself
+
+            # Copy kept state back to loop/
+            if kept_diffs:
+                shutil.copy(os.path.join(scratch_dir, "solver.py"),
+                            os.path.join(LOOP_DIR, "solver.py"))
+                shutil.copytree(os.path.join(scratch_dir, "prompts"),
+                                os.path.join(LOOP_DIR, "prompts"),
+                                dirs_exist_ok=True)
+
+            final_score = grade_solver(os.path.join(LOOP_DIR, "solver.py"), args.dev)
+            log_event("milestone",
+                      f"Generation {gen} finished with {len(kept_diffs)} kept "
+                      f"changes at {final_score['total']}% total.",
+                      score=final_score)
+        finally:
+            shutil.rmtree(scratch_dir, ignore_errors=True)
+
+if __name__ == "__main__":
+    main()

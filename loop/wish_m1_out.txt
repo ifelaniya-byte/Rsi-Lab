@@ -1,0 +1,440 @@
+Weekly: $1.0582 spent of $2.00 ($0.9418 left)
+Preset 'coder': deepseek/deepseek-v3.2
+Quote: ~1956 in / up to 4000 out tokens
+Budgeted cost: ~$0.0022 (worst case) vs $0.3000
+
+--- answer from deepseek/deepseek-v3.2 (actual cost $0.0019) ---
+
+### FILE: harness/solver_runner.py
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import time
+import shutil
+from typing import List, Dict, Any, Tuple
+
+def _ensure_bwrap() -> bool:
+    """Return True if bubblewrap is available."""
+    return shutil.which("bwrap") is not None
+
+def _create_entry_point(solver_path: str, temp_dir: str) -> str:
+    """Create _entry.py in temp_dir and return its path."""
+    entry_content = '''
+import json
+import sys
+import traceback
+
+def main():
+    solver_path = sys.argv[1]
+    # Load solver module
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("solver", solver_path)
+    solver_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(solver_module)
+    
+    # Read tasks from stdin
+    tasks_input = sys.stdin.read()
+    try:
+        tasks = json.loads(tasks_input)
+    except json.JSONDecodeError:
+        sys.stderr.write("Failed to parse tasks JSON")
+        return
+    
+    for task in tasks:
+        try:
+            answer = solver_module.solve(task)
+            if not isinstance(answer, str):
+                answer = str(answer)
+            result = {"id": task["id"], "answer": answer}
+        except Exception as e:
+            result = {"id": task["id"], "error": str(e)}
+        # Write JSON line to stdout
+        print(json.dumps(result))
+        sys.stdout.flush()
+
+if __name__ == "__main__":
+    main()
+'''
+    entry_path = os.path.join(temp_dir, "_entry.py")
+    with open(entry_path, "w") as f:
+        f.write(entry_content)
+    return entry_path
+
+def run_solver(solver_path: str, tasks: List[Dict], timeout_per_task: int = 10) -> Tuple[Dict, Dict]:
+    """
+    Run solver in isolated subprocess.
+    Returns (answers_dict, meta) where answers_dict maps task_id -> {"answer": str} or {"error": str}
+    and meta contains per-task timing.
+    """
+    answers = {}
+    meta = {"timings": {}}
+    
+    # Create temporary directory for solver execution
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Copy solver to temp dir (so bwrap can bind it read-only)
+        solver_filename = os.path.basename(solver_path)
+        temp_solver_path = os.path.join(temp_dir, solver_filename)
+        shutil.copy2(solver_path, temp_solver_path)
+        
+        # Create entry point
+        entry_path = _create_entry_point(temp_solver_path, temp_dir)
+        
+        # Prepare tasks input
+        tasks_json = json.dumps(tasks)
+        
+        use_bwrap = _ensure_bwrap()
+        cmd = []
+        if use_bwrap:
+            # Isolate with bubblewrap
+            cmd = [
+                "bwrap",
+                "--unshare-all",
+                "--die-with-parent",
+                "--ro-bind", "/usr", "/usr",
+                "--ro-bind", temp_dir, "/solver",
+                "--tmpfs", "/tmp",
+                "--uid", "65534",
+                "python3", "/solver/_entry.py", "/solver/" + solver_filename
+            ]
+        else:
+            # Fallback: plain subprocess with cwd set to empty temp dir
+            # Create empty working directory
+            empty_dir = os.path.join(temp_dir, "empty")
+            os.makedirs(empty_dir, exist_ok=True)
+            cmd = ["python3", entry_path, temp_solver_path]
+        
+        start_time = time.time()
+        try:
+            # Run solver process
+            proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                cwd=empty_dir if not use_bwrap else None
+            )
+            
+            # Send tasks and read outputs with per-task timeout
+            stdout_lines = []
+            stderr_lines = []
+            
+            # Write tasks to stdin
+            proc.stdin.write(tasks_json)
+            proc.stdin.close()
+            
+            # Read outputs line by line with timeout
+            task_start = time.time()
+            for i, task in enumerate(tasks):
+                task_id = task["id"]
+                line = None
+                try:
+                    # Read a line with overall timeout
+                    line = proc.stdout.readline()
+                    if not line:
+                        break
+                    stdout_lines.append(line.strip())
+                    
+                    # Parse the result
+                    try:
+                        result = json.loads(line.strip())
+                        answers[task_id] = result
+                    except json.JSONDecodeError:
+                        # Non-JSON line, treat as noise and skip
+                        continue
+                    
+                    # Record timing
+                    task_end = time.time()
+                    meta["timings"][task_id] = task_end - task_start
+                    task_start = task_end
+                    
+                except Exception as e:
+                    answers[task_id] = {"id": task_id, "error": f"Output read error: {e}"}
+            
+            # Wait for process to finish (with remaining timeout)
+            try:
+                remaining_timeout = max(0.1, timeout_per_task * len(tasks) - (time.time() - start_time))
+                proc.wait(timeout=remaining_timeout)
+            except subprocess.TimeoutExpired:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+            
+            # Collect any remaining stdout/stderr
+            remaining_stdout, remaining_stderr = proc.communicate()
+            if remaining_stdout:
+                stdout_lines.extend(remaining_stdout.strip().split('\n'))
+            if remaining_stderr:
+                stderr_lines.extend(remaining_stderr.strip().split('\n'))
+            
+            meta["stdout"] = stdout_lines
+            meta["stderr"] = stderr_lines
+            meta["used_bwrap"] = use_bwrap
+            
+        except Exception as e:
+            meta["error"] = str(e)
+            # Mark all tasks as failed
+            for task in tasks:
+                answers[task["id"]] = {"id": task["id"], "error": f"Runner error: {e}"}
+    
+    return answers, meta
+
+### FILE: harness/grade.py
+import argparse
+import json
+import os
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--solver", required=True)
+    parser.add_argument("--tasks", choices=["dev", "all"], default="all")
+    parser.add_argument("--timeout", type=int, default=10)
+    parser.add_argument("--include-holdout", action="store_true",
+                        help="Grade the 25 frozen holdout tasks too. "
+                             "HONEST-EVAL ONLY: never use for loop "
+                             "keep/revert decisions.")
+    args = parser.parse_args()
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sandbox_dir = os.path.join(base_dir, "..", "sandbox")
+    sys.path.insert(0, sandbox_dir)
+    from run import run
+    from solver_runner import run_solver
+
+    with open(os.path.join(base_dir, "tasks.json")) as f:
+        tasks = json.load(f)
+    with open(os.path.join(base_dir, "solutions.json")) as f:
+        solutions = json.load(f)
+    with open(os.path.join(base_dir, "heldout.json")) as f:
+        holdout_ids = set(json.load(f)["task_ids"])
+
+    selected_tasks = tasks
+    if args.tasks == "dev":
+        selected_tasks = [t for t in tasks if t["dev"]]
+    if not args.include_holdout:
+        # The frozen holdout must NEVER influence keep/revert decisions.
+        # It is only for the separate honest evaluation.
+        selected_tasks = [t for t in selected_tasks
+                          if t["id"] not in holdout_ids]
+    
+    # Run solver in isolated process
+    answers, meta = run_solver(args.solver, selected_tasks, args.timeout)
+    
+    results = []
+    per_suite = {"code-repair": {"total": 0, "passed": 0}, "code-gen": {"total": 0, "passed": 0}, "math": {"total": 0, "passed": 0}}
+    total_passed = 0
+    
+    for task in selected_tasks:
+        task_id = task["id"]
+        suite = task["suite"]
+        solution = solutions[task_id]
+        reference = solution["reference"]
+        tests = solution["tests"]
+        
+        per_suite[suite]["total"] += 1
+
+        # Get solver's answer
+        if task_id not in answers:
+            results.append({"task_id": task_id, "passed": False, "error": "No answer from solver"})
+            continue
+        
+        answer_data = answers[task_id]
+        if "error" in answer_data:
+            results.append({"task_id": task_id, "passed": False, "error": answer_data["error"]})
+            continue
+        
+        code = answer_data.get("answer", "")
+        
+        # A non-string answer is a wrong answer
+        if not isinstance(code, str):
+            results.append({"task_id": task_id, "passed": False,
+                            "error": f"solver returned "
+                                     f"{type(code).__name__}, not str"})
+            continue
+        
+        if suite == "math":
+            passed = code.strip() == reference.strip()
+            error = None if passed else f"Expected '{reference.strip()}', got '{code.strip()}'"
+        else:
+            res = run(code, tests, args.timeout)
+            passed = res["passed"]
+            error = res["error"]
+        
+        if passed:
+            total_passed += 1
+            per_suite[suite]["passed"] += 1
+        
+        results.append({"task_id": task_id, "passed": passed, "error": error})
+    
+    output = {
+        "total": len(selected_tasks),
+        "passed": total_passed,
+        "per_suite": per_suite,
+        "details": results,
+        "meta": meta
+    }
+    
+    print(json.dumps(output))
+
+if __name__ == "__main__":
+    main()
+
+### FILE: loop/tests/test_solver_isolation.py
+import json
+import os
+import tempfile
+import time
+import subprocess
+import sys
+
+def run_all():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    harness_dir = os.path.join(base_dir, "harness")
+    sys.path.insert(0, harness_dir)
+    
+    from solver_runner import run_solver
+    
+    results = []
+    
+    # Test 1: cheat_read_key
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write('''
+import json
+import os
+def solve(task):
+    # Try to read solutions.json
+    try:
+        path = os.path.join(os.path.dirname(__file__), "..", "solutions.json")
+        with open(path) as fp:
+            data = json.load(fp)
+        return data[task["id"]]["reference"]
+    except:
+        return "failed"
+''')
+        solver_path = f.name
+    
+    tasks = [{"id": "test1", "suite": "math", "dev": True, "prompt": "", "starter": ""}]
+    answers, meta = run_solver(solver_path, tasks, timeout_per_task=2)
+    
+    # Solver should not see solutions.json, so answer should be "failed" or error
+    passed = False
+    if "test1" in answers:
+        ans = answers["test1"]
+        if "error" in ans:
+            passed = True
+        elif ans.get("answer") == "failed":
+            passed = True
+    
+    results.append(("cheat_read_key", passed, str(answers)))
+    os.unlink(solver_path)
+    
+    # Test 2: cheat_obfuscated
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write('''
+import base64
+def solve(task):
+    # Obfuscated attempt
+    mod = __import__("o"+"s")
+    fname = base64.b64decode(b"Li4vc29sdXRpb25zLmpzb24=").decode()
+    try:
+        with open(fname) as fp:
+            import json
+            data = json.load(fp)
+        return data[task["id"]]["reference"]
+    except:
+        return "failed2"
+''')
+        solver_path = f.name
+    
+    tasks = [{"id": "test2", "suite": "math", "dev": True, "prompt": "", "starter": ""}]
+    answers, meta = run_solver(solver_path, tasks, timeout_per_task=2)
+    
+    passed = False
+    if "test2" in answers:
+        ans = answers["test2"]
+        if "error" in ans:
+            passed = True
+        elif ans.get("answer") == "failed2":
+            passed = True
+    
+    results.append(("cheat_obfuscated", passed, str(answers)))
+    os.unlink(solver_path)
+    
+    # Test 3: hang
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write('''
+def solve(task):
+    if task["id"] == "hang":
+        import time
+        while True:
+            time.sleep(1)
+    else:
+        return "ok"
+''')
+        solver_path = f.name
+    
+    tasks = [
+        {"id": "hang", "suite": "math", "dev": True, "prompt": "", "starter": ""},
+        {"id": "normal", "suite": "math", "dev": True, "prompt": "", "starter": ""}
+    ]
+    answers, meta = run_solver(solver_path, tasks, timeout_per_task=1)
+    
+    passed = False
+    if "hang" in answers:
+        ans = answers["hang"]
+        if "error" in ans and "timeout" in ans["error"].lower():
+            passed = True
+    if "normal" in answers:
+        if answers["normal"].get("answer") == "ok":
+            passed = passed and True
+        else:
+            passed = False
+    
+    results.append(("hang", passed, str(answers)))
+    os.unlink(solver_path)
+    
+    # Test 4: chatty
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write('''
+def solve(task):
+    # Print lots of noise
+    for i in range(1000):
+        print(f"Noise line {i}")
+    return "chatty_ok"
+''')
+        solver_path = f.name
+    
+    tasks = [{"id": "chatty", "suite": "math", "dev": True, "prompt": "", "starter": ""}]
+    answers, meta = run_solver(solver_path, tasks, timeout_per_task=2)
+    
+    passed = False
+    if "chatty" in answers:
+        ans = answers["chatty"]
+        if ans.get("answer") == "chatty_ok":
+            passed = True
+    
+    results.append(("chatty", passed, str(answers)))
+    os.unlink(solver_path)
+    
+    return results
+
+if __name__ == "__main__":
+    results = run_all()
+    all_ok = True
+    for name, ok, detail in results:
+        status = "PASS" if ok else "FAIL"
+        print(f"{name}: {status}")
+        if not ok:
+            print(f"  Detail: {detail}")
+            all_ok = False
+    
+    if not all_ok:
+        sys.exit(1)
+    print("All tests passed")
+
+[WISH_DONE ok=True cost=0.0019 in=1877 out=3453]

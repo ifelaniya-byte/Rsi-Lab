@@ -1,0 +1,35 @@
+You are an expert Python programmer. Implement MILESTONE M1 of the attached plan: sandbox the solver itself.
+
+Context: a self-improving AI lab. `harness/grade.py` currently imports the solver with importlib and runs `solve(task)` IN-PROCESS with full filesystem privileges — a proven cheat vector (a solver reading `solutions.json` scores 5/5 doing zero work). Only the code the solver GENERATES is sandboxed today, not the solver itself.
+
+OUTPUT RULES:
+- Output ONLY the new/changed file contents, each preceded by `### FILE: <path>`. No explanations, no code fences — raw file contents only.
+- Under 2500 words. Working code, Python 3.11+, stdlib only except where noted.
+
+## What to build
+
+### 1. `harness/solver_runner.py` (new)
+- `run_solver(solver_path, tasks, timeout_per_task=10)`:
+  - Launches the solver as a child subprocess under `bubblewrap` (`bwrap`): `--unshare-all --die-with-parent --ro-bind /usr /usr --ro-bind <solver_dir> /solver --tmpfs /tmp --uid 65534`. The child may NOT see the repo, the secrets dir, or the network.
+  - The child reads tasks (JSON list of `{id, suite, prompt, starter}`) from stdin, writes `{"id":..., "answer":...}` JSONL to stdout (one line per task). A per-task wall clock kills hangs; a hanging task records `{"id":..., "error":"timeout"}` and grading continues.
+  - If `bwrap` is not installed, fall back to a plain subprocess with `cwd` set to an empty temp dir (documented as weaker; the test asserts bwrap is preferred when available).
+  - Returns `(answers_dict, meta)` where meta has per-task timing.
+- The child entry (`_entry.py`, written to the temp solver dir by run_solver): imports the solver file by path, calls `solve(task)` per task, prints JSONL. Any exception in solve -> `{"id":..., "error": <str>}`.
+
+### 2. `harness/grade.py` (modify)
+- DELETE the `importlib`/`exec_module` in-process path. Call `run_solver()` to get answers, THEN open `solutions.json` and score. The solver process never sees the answer key.
+- Keep the CLI (`--solver`, `--tasks`, `--timeout`, `--include-holdout`), the JSON output contract, and the holdout exclusion.
+
+### 3. `loop/tests/test_solver_isolation.py` (new test)
+Repo test convention: `def run_all()` -> `(name, ok, detail)` tuples; `__main__` prints PASS/FAIL, exits nonzero on failure.
+- `cheat_read_key`: a solver that `open()`s `solutions.json` scores 0/N (it cannot see the file).
+- `cheat_obfuscated`: solver using `__import__("o"+"s")` + base64-encoded filename also scores 0.
+- `hang`: `while True` solver -> that task times out, others grade, total runtime bounded.
+- `chatty`: solver that prints 1000 lines of spam still parses (answers read as JSONL, stdout noise tolerated — specify how _entry.py separates protocol from noise, e.g. answers go to fd 3 or are line-delimited JSON and non-JSON lines are ignored).
+
+## Constraints
+- Do not change the task format, the scoring logic, or the JSON output contract.
+- The math-suite path (`code.strip() == reference.strip()`) is preserved.
+
+## Attached source
+`harness/grade.py` (full) and `harness/stub_solver.py` (reference solver shape) follow.

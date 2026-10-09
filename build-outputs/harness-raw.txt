@@ -1,0 +1,309 @@
+```python
+# FILE: harness/gen_tasks.py
+import json
+import random
+
+rng = random.Random(42)
+
+def gen_code_repair_tasks():
+    tasks = []
+    solutions = {}
+    families = [
+        ("off_by_one", lambda n: n - 1, "def sum_to_n(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total", "def sum_to_n(n):\n    total = 0\n    for i in range(n + 1):\n        total += i\n    return total"),
+        ("wrong_comparison", lambda n: n, "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 == 0:\n            count += 1\n    return count", "def count_even(nums):\n    count = 0\n    for x in nums:\n        if x % 2 != 0:\n            count += 1\n    return count"),
+        ("missing_base_case", lambda n: 1 if n <= 1 else n * factorial(n - 1), "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n - 1)", "def factorial(n):\n    return n * factorial(n - 1)"),
+        ("swapped_args", lambda a, b: a - b, "def subtract(a, b):\n    return a - b", "def subtract(a, b):\n    return b - a"),
+        ("forget_return", lambda lst: len(lst), "def get_length(lst):\n    len(lst)", "def get_length(lst):\n    return len(lst)"),
+        ("mutate_input", lambda lst: sorted(lst), "def sort_copy(lst):\n    lst.sort()\n    return lst", "def sort_copy(lst):\n    return sorted(lst)"),
+        ("int_division", lambda a, b: a / b, "def divide(a, b):\n    return a // b", "def divide(a, b):\n    return a / b"),
+        ("wrong_accumulator", lambda lst: sum(lst), "def sum_list(lst):\n    total = 1\n    for x in lst:\n        total += x\n    return total", "def sum_list(lst):\n    total = 0\n    for x in lst:\n        total += x\n    return total"),
+    ]
+    for i in range(1, 41):
+        family = families[i % len(families)]
+        name, func, buggy, correct = family
+        task_id = f"repair-{i:02d}"
+        prompt = f"Write a function named `{name}` that takes appropriate arguments and returns the correct result. Fix the bug in the provided starter code."
+        starter = buggy
+        reference = correct
+        tests = f"assert {name}({i}) == {func(i)}\n"
+        tasks.append({"id": task_id, "suite": "code-repair", "prompt": prompt, "starter": starter, "dev": i <= 5})
+        solutions[task_id] = {"reference": reference, "tests": tests}
+    return tasks, solutions
+
+def gen_code_gen_tasks():
+    tasks = []
+    solutions = {}
+    families = [
+        ("reverse_string", lambda s: s[::-1], "def reverse_string(s):\n    '''Return the reversed string.'''\n    pass"),
+        ("filter_even", lambda lst: [x for x in lst if x % 2 == 0], "def filter_even(lst):\n    '''Return a list of even numbers from lst.'''\n    pass"),
+        ("sum_of_squares", lambda lst: sum(x**2 for x in lst), "def sum_of_squares(lst):\n    '''Return the sum of squares of elements in lst.'''\n    pass"),
+        ("count_words", lambda s: len(s.split()), "def count_words(s):\n    '''Return the number of words in string s.'''\n    pass"),
+        ("max_in_list", lambda lst: max(lst), "def max_in_list(lst):\n    '''Return the maximum value in lst.'''\n    pass"),
+        ("is_palindrome", lambda s: s == s[::-1], "def is_palindrome(s):\n    '''Return True if s is a palindrome.'''\n    pass"),
+        ("factorial", lambda n: 1 if n <= 1 else n * factorial(n - 1), "def factorial(n):\n    '''Return the factorial of n.'''\n    pass"),
+        ("fibonacci", lambda n: n if n <= 1 else fibonacci(n-1) + fibonacci(n-2), "def fibonacci(n):\n    '''Return the nth Fibonacci number.'''\n    pass"),
+        ("dict_sum", lambda d: sum(d.values()), "def dict_sum(d):\n    '''Return the sum of all values in dictionary d.'''\n    pass"),
+        ("find_max_index", lambda lst: lst.index(max(lst)), "def find_max_index(lst):\n    '''Return the index of the maximum value in lst.'''\n    pass"),
+    ]
+    for i in range(1, 41):
+        family = families[i % len(families)]
+        name, func, starter = family
+        task_id = f"gen-{i:02d}"
+        prompt = f"Write a function named `{name}` that takes appropriate arguments and returns the correct result."
+        reference = f"def {name}({', '.join(['arg' + str(j) for j in range(3)])}):\n    return {func.__code__.co_consts[1] if hasattr(func, '__code__') else 'pass'}"
+        # Simpler approach for reference
+        if name == "reverse_string":
+            reference = "def reverse_string(s):\n    return s[::-1]"
+        elif name == "filter_even":
+            reference = "def filter_even(lst):\n    return [x for x in lst if x % 2 == 0]"
+        elif name == "sum_of_squares":
+            reference = "def sum_of_squares(lst):\n    return sum(x**2 for x in lst)"
+        elif name == "count_words":
+            reference = "def count_words(s):\n    return len(s.split())"
+        elif name == "max_in_list":
+            reference = "def max_in_list(lst):\n    return max(lst)"
+        elif name == "is_palindrome":
+            reference = "def is_palindrome(s):\n    return s == s[::-1]"
+        elif name == "factorial":
+            reference = "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)"
+        elif name == "fibonacci":
+            reference = "def fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)"
+        elif name == "dict_sum":
+            reference = "def dict_sum(d):\n    return sum(d.values())"
+        elif name == "find_max_index":
+            reference = "def find_max_index(lst):\n    return lst.index(max(lst))"
+        
+        tests = f"assert {name}('hello') == 'olleh'\n" if name == "reverse_string" else \
+                f"assert {name}([1, 2, 3, 4, 5]) == [2, 4]\n" if name == "filter_even" else \
+                f"assert {name}([1, 2, 3]) == 14\n" if name == "sum_of_squares" else \
+                f"assert {name}('hello world') == 2\n" if name == "count_words" else \
+                f"assert {name}([1, 5, 3, 9, 2]) == 9\n" if name == "max_in_list" else \
+                f"assert {name}('racecar') == True\n" if name == "is_palindrome" else \
+                f"assert {name}(5) == 120\n" if name == "factorial" else \
+                f"assert {name}(10) == 55\n" if name == "fibonacci" else \
+                f"assert {name}({{1: 10, 2: 20, 3: 30}}) == 60\n" if name == "dict_sum" else \
+                f"assert {name}([1, 5, 3, 9, 2]) == 3\n"
+        
+        tasks.append({"id": task_id, "suite": "code-gen", "prompt": prompt, "starter": starter, "dev": i <= 5})
+        solutions[task_id] = {"reference": reference, "tests": tests}
+    return tasks, solutions
+
+def gen_math_tasks():
+    tasks = []
+    solutions = {}
+    families = [
+        ("integer_arithmetic", lambda: f"{rng.randint(1, 100)} + {rng.randint(1, 100)} * {rng.randint(1, 100)}"),
+        ("fractions", lambda: f"1/2 + 1/3 + 1/6"),
+        ("percentages", lambda: f"What is {rng.randint(10, 90)}% of {rng.randint(100, 1000)}?"),
+        ("linear_equation", lambda: f"Solve for x: 3x + 7 = {rng.randint(20, 50)}"),
+        ("gcd_lcm", lambda: f"GCD of {rng.randint(10, 100)} and {rng.randint(10, 100)}"),
+        ("modular_arithmetic", lambda: f"{rng.randint(10, 100)} mod {rng.randint(2, 20)}"),
+        ("area_perimeter", lambda: f"Area of rectangle with length {rng.randint(5, 20)} and width {rng.randint(5, 20)}"),
+    ]
+    for i in range(1, 61):
+        family = families[i % len(families)]
+        task_id = f"math-{i:02d}"
+        prompt = family()
+        # Compute answer
+        if "integer_arithmetic" in str(family):
+            parts = prompt.split()
+            a, b, c = int(parts[0]), int(parts[2]), int(parts[4])
+            answer = str(a + b * c)
+        elif "fractions" in str(family):
+            answer = "1"
+        elif "percentages" in str(family):
+            parts = prompt.split()
+            pct, num = int(parts[2].rstrip('%')), int(parts[4].rstrip('?'))
+            answer = str(pct * num // 100)
+        elif "linear_equation" in str(family):
+            rhs = int(prompt.split('=')[1].strip())
+            answer = str((rhs - 7) // 3)
+        elif "gcd_lcm" in str(family):
+            import math
+            parts = prompt.split()
+            a, b = int(parts[2]), int(parts[4])
+            answer = str(math.gcd(a, b))
+        elif "modular_arithmetic" in str(family):
+            parts = prompt.split()
+            a, b = int(parts[0]), int(parts[2])
+            answer = str(a % b)
+        elif "area_perimeter" in str(family):
+            parts = prompt.split()
+            l, w = int(parts[5]), int(parts[8])
+            answer = str(l * w)
+        
+        tasks.append({"id": task_id, "suite": "math", "prompt": prompt, "starter": prompt, "dev": i <= 5})
+        solutions[task_id] = {"reference": answer, "tests": ""}
+    return tasks, solutions
+
+def main():
+    repair_tasks, repair_solutions = gen_code_repair_tasks()
+    gen_tasks, gen_solutions = gen_code_gen_tasks()
+    math_tasks, math_solutions = gen_math_tasks()
+    
+    all_tasks = repair_tasks + gen_tasks + math_tasks
+    all_solutions = {**repair_solutions, **gen_solutions, **math_solutions}
+    
+    with open("harness/tasks.json", "w") as f:
+        json.dump(all_tasks, f, indent=2)
+    
+    with open("harness/solutions.json", "w") as f:
+        json.dump(all_solutions, f, indent=2)
+
+if __name__ == "__main__":
+    main()
+```
+
+```python
+# FILE: harness/verify.py
+import json
+import os
+
+def main():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(base_dir, "tasks.json")) as f:
+        tasks = json.load(f)
+    with open(os.path.join(base_dir, "solutions.json")) as f:
+        solutions = json.load(f)
+    
+    suite_counts = {"code-repair": {"total": 0, "passed": 0}, "code-gen": {"total": 0, "passed": 0}, "math": {"total": 0, "passed": 0}}
+    all_passed = True
+    
+    for task in tasks:
+        suite = task["suite"]
+        task_id = task["id"]
+        solution = solutions[task_id]
+        reference = solution["reference"]
+        tests = solution["tests"]
+        
+        suite_counts[suite]["total"] += 1
+        
+        try:
+            # Test reference passes tests
+            ns = {}
+            exec(reference, ns)
+            exec(tests, ns)
+            ref_passed = True
+        except Exception as e:
+            ref_passed = False
+            print(f"FAIL: {task_id} - Reference failed tests: {e}")
+            all_passed = False
+        
+        if suite == "code-repair":
+            try:
+                # Test starter fails tests
+                ns = {}
+                exec(task["starter"], ns)
+                exec(tests, ns)
+                starter_passed = True
+            except Exception:
+                starter_passed = False
+            
+            if not starter_passed and ref_passed:
+                suite_counts[suite]["passed"] += 1
+            else:
+                if starter_passed:
+                    print(f"FAIL: {task_id} - Starter should fail but passed")
+                    all_passed = False
+                elif not ref_passed:
+                    print(f"FAIL: {task_id} - Reference should pass but failed")
+                    all_passed = False
+        else:
+            if ref_passed:
+                suite_counts[suite]["passed"] += 1
+            else:
+                all_passed = False
+    
+    for suite, counts in suite_counts.items():
+        print(f"{suite}: {counts['passed']}/{counts['total']}")
+    
+    if all_passed:
+        print("PASS")
+    else:
+        print("FAIL")
+    
+    return 0 if all_passed else 1
+
+if __name__ == "__main__":
+    exit(main())
+```
+
+```python
+# FILE: harness/grade.py
+import argparse
+import importlib.util
+import json
+import os
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--solver", required=True)
+    parser.add_argument("--tasks", choices=["dev", "all"], default="all")
+    parser.add_argument("--timeout", type=int, default=10)
+    args = parser.parse_args()
+    
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sandbox_dir = os.path.join(base_dir, "..", "sandbox")
+    sys.path.insert(0, sandbox_dir)
+    from run import run
+    
+    with open(os.path.join(base_dir, "tasks.json")) as f:
+        tasks = json.load(f)
+    with open(os.path.join(base_dir, "solutions.json")) as f:
+        solutions = json.load(f)
+    
+    # Load solver module
+    spec = importlib.util.spec_from_file_location("solver", args.solver)
+    solver_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(solver_module)
+    
+    selected_tasks = tasks
+    if args.tasks == "dev":
+        selected_tasks = [t for t in tasks if t["dev"]]
+    
+    results = []
+    per_suite = {"code-repair": {"total": 0, "passed": 0}, "code-gen": {"total": 0, "passed": 0}, "math": {"total": 0, "passed": 0}}
+    total_passed = 0
+    
+    for task in selected_tasks:
+        task_id = task["id"]
+        suite = task["suite"]
+        solution = solutions[task_id]
+        reference = solution["reference"]
+        tests = solution["tests"]
+        
+        per_suite[suite]["total"] += 1
+        
+        try:
+            code = solver_module.solve(task)
+        except Exception as e:
+            results.append({"task_id": task_id, "passed": False, "error": str(e)})
+            continue
+        
+        if suite == "math":
+            passed = code.strip() == reference.strip()
+            error = None if passed else f"Expected '{reference.strip()}', got '{code.strip()}'"
+        else:
+            res = run(code, tests, args.timeout)
+            passed = res["passed"]
+            error = res["error"]
+        
+        if passed:
+            total_passed += 1
+            per_suite[suite]["passed"] += 1
+        
+        results.append({"task_id": task_id, "passed": passed, "error": error})
+    
+    output = {
+        "total": len(selected_tasks),
+        "passed": total_passed,
+        "per_suite": per_suite,
+        "details": results
+    }
+    
+    print(json.dumps(output))
+
+if __name__ == "__main__":
+    main()
+```

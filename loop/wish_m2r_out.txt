@@ -1,0 +1,2855 @@
+Weekly: $1.0695 spent of $2.00 ($0.9305 left)
+Preset 'coder': deepseek/deepseek-v3.2
+Quote: ~2014 in / up to 14000 out tokens
+Budgeted cost: ~$0.0064 (worst case) vs $0.3000
+
+--- answer from deepseek/deepseek-v3.2 (actual cost $0.0191) ---
+
+### FILE: harness/gen_tasks.py
+import json
+import random
+import argparse
+import sys
+import os
+
+def generate_math_addition(rng, variant):
+    a = rng.randint(1, 100)
+    b = rng.randint(1, 100)
+    answer = a + b
+    if variant == 0:
+        return f"{a} + {b} = ?", str(answer)
+    else:
+        # variant 1: missing operand
+        missing = rng.choice(["a", "b"])
+        if missing == "a":
+            return f"? + {b} = {answer}", str(a)
+        else:
+            return f"{a} + ? = {answer}", str(b)
+
+def generate_math_subtraction(rng, variant):
+    a = rng.randint(1, 100)
+    b = rng.randint(1, 100)
+    if a < b:
+        a, b = b, a
+    answer = a - b
+    if variant == 0:
+        return f"{a} - {b} = ?", str(answer)
+    else:
+        # variant 1: missing minuend
+        return f"? - {b} = {answer}", str(a)
+
+def generate_math_multiplication(rng, variant):
+    a = rng.randint(1, 20)
+    b = rng.randint(1, 20)
+    answer = a * b
+    if variant == 0:
+        return f"{a} * {b} = ?", str(answer)
+    else:
+        # variant 1: missing factor
+        missing = rng.choice(["a", "b"])
+        if missing == "a":
+            return f"? * {b} = {answer}", str(a)
+        else:
+            return f"{a} * ? = {answer}", str(b)
+
+def generate_math_division(rng, variant):
+    b = rng.randint(2, 10)
+    a = b * rng.randint(1, 10)
+    answer = a // b
+    if variant == 0:
+        return f"{a} / {b} = ?", str(answer)
+    else:
+        # variant 1: missing dividend
+        return f"? / {b} = {answer}", str(a)
+
+def generate_math_modulo(rng, variant):
+    a = rng.randint(10, 100)
+    b = rng.randint(2, 10)
+    answer = a % b
+    if variant == 0:
+        return f"{a} % {b} = ?", str(answer)
+    else:
+        # variant 1: missing dividend
+        return f"? % {b} = {answer}", str(a)
+
+def generate_math_exponent(rng, variant):
+    a = rng.randint(2, 5)
+    b = rng.randint(2, 4)
+    answer = a ** b
+    if variant == 0:
+        return f"{a}^{b} = ?", str(answer)
+    else:
+        # variant 1: missing base
+        return f"?^{b} = {answer}", str(a)
+
+def generate_math_sqrt(rng, variant):
+    a = rng.randint(1, 10)
+    square = a * a
+    if variant == 0:
+        return f"sqrt({square}) = ?", str(a)
+    else:
+        # variant 1: missing square
+        return f"sqrt(?) = {a}", str(square)
+
+def generate_math_fibonacci(rng, variant):
+    n = rng.randint(1, 10)
+    fib = [0, 1]
+    for i in range(2, n+1):
+        fib.append(fib[i-1] + fib[i-2])
+    answer = fib[n]
+    if variant == 0:
+        return f"fib({n}) = ?", str(answer)
+    else:
+        # variant 1: missing index
+        return f"fib(?) = {answer}", str(n)
+
+def generate_math_prime(rng, variant):
+    primes = [2,3,5,7,11,13,17,19,23,29]
+    p = rng.choice(primes)
+    if variant == 0:
+        return f"Is {p} prime? (yes/no)", "yes"
+    else:
+        # variant 1: composite
+        comp = rng.choice([4,6,8,9,10,12,14,15,16,18])
+        return f"Is {comp} prime? (yes/no)", "no"
+
+def generate_math_gcd(rng, variant):
+    a = rng.randint(1, 50)
+    b = rng.randint(1, 50)
+    import math
+    answer = math.gcd(a, b)
+    if variant == 0:
+        return f"gcd({a}, {b}) = ?", str(answer)
+    else:
+        # variant 1: missing a
+        return f"gcd(?, {b}) = {answer}", str(a)
+
+def generate_math_lcm(rng, variant):
+    a = rng.randint(1, 20)
+    b = rng.randint(1, 20)
+    import math
+    answer = a * b // math.gcd(a, b)
+    if variant == 0:
+        return f"lcm({a}, {b}) = ?", str(answer)
+    else:
+        # variant 1: missing a
+        return f"lcm(?, {b}) = {answer}", str(a)
+
+def generate_code_repair_fizzbuzz(rng, variant):
+    bug = rng.choice([
+        "if i % 3 == 0 and i % 5 == 0:",
+        "if i % 3 == 0:",
+        "if i % 5 == 0:",
+        "print(i)"
+    ])
+    if bug == "if i % 3 == 0 and i % 5 == 0:":
+        buggy = "if i % 3 == 0 or i % 5 == 0:"
+    elif bug == "if i % 3 == 0:":
+        buggy = "if i % 5 == 0:"
+    elif bug == "if i % 5 == 0:":
+        buggy = "if i % 3 == 0:"
+    else:
+        buggy = "print('FizzBuzz')"
+    code = f"""
+for i in range(1, 101):
+    {buggy}
+        print('FizzBuzz')
+    elif i % 3 == 0:
+        print('Fizz')
+    elif i % 5 == 0:
+        print('Buzz')
+    else:
+        print(i)
+"""
+    tests = [
+        {"input": "", "output": "1\\n2\\nFizz\\n4\\nBuzz\\nFizz\\n7\\n8\\nFizz\\nBuzz\\n11\\nFizz\\n13\\n14\\nFizzBuzz\\n16\\n17\\nFizz\\n19\\nBuzz\\nFizz\\n22\\n23\\nFizz\\nBuzz\\n26\\nFizz\\n28\\n29\\nFizzBuzz\\n31\\n32\\nFizz\\n34\\nBuzz\\nFizz\\n37\\n38\\nFizz\\nBuzz\\n41\\nFizz\\n43\\n44\\nFizzBuzz\\n46\\n47\\nFizz\\n49\\nBuzz\\nFizz\\n52\\n53\\nFizz\\nBuzz\\n56\\nFizz\\n58\\n59\\nFizzBuzz\\n61\\n62\\nFizz\\n64\\nBuzz\\nFizz\\n67\\n68\\nFizz\\nBuzz\\n71\\nFizz\\n73\\n74\\nFizzBuzz\\n76\\n77\\nFizz\\n79\\nBuzz\\nFizz\\n82\\n83\\nFizz\\nBuzz\\n86\\nFizz\\n88\\n89\\nFizzBuzz\\n91\\n92\\nFizz\\n94\\nBuzz\\nFizz\\n97\\n98\\nFizz\\nBuzz"}
+    ]
+    return code, tests
+
+def generate_code_repair_factorial(rng, variant):
+    bug = rng.choice([
+        "if n == 0:",
+        "return 1",
+        "return n * factorial(n-1)"
+    ])
+    if bug == "if n == 0:":
+        buggy = "if n == 1:"
+    elif bug == "return 1":
+        buggy = "return 0"
+    else:
+        buggy = "return n * factorial(n)"
+    code = f"""
+def factorial(n):
+    {buggy}
+    else:
+        return n * factorial(n-1)
+"""
+    tests = [
+        {"input": "0", "output": "1"},
+        {"input": "1", "output": "1"},
+        {"input": "5", "output": "120"},
+        {"input": "7", "output": "5040"}
+    ]
+    return code, tests
+
+def generate_code_repair_palindrome(rng, variant):
+    bug = rng.choice([
+        "if s == s[::-1]:",
+        "return True",
+        "return False"
+    ])
+    if bug == "if s == s[::-1]:":
+        buggy = "if s != s[::-1]:"
+    elif bug == "return True":
+        buggy = "return False"
+    else:
+        buggy = "return True"
+    code = f"""
+def is_palindrome(s):
+    {buggy}
+"""
+    tests = [
+        {"input": "'racecar'", "output": "True"},
+        {"input": "'hello'", "output": "False"},
+        {"input": "'a'", "output": "True"},
+        {"input": "'abba'", "output": "True"}
+    ]
+    return code, tests
+
+def generate_code_repair_sumlist(rng, variant):
+    bug = rng.choice([
+        "total = 0",
+        "for x in lst:",
+        "total += x"
+    ])
+    if bug == "total = 0":
+        buggy = "total = 1"
+    elif bug == "for x in lst:":
+        buggy = "for x in range(len(lst)):"
+    else:
+        buggy = "total = x"
+    code = f"""
+def sum_list(lst):
+    total = 0
+    for x in lst:
+        total += x
+    return total
+""".replace(bug, buggy)
+    tests = [
+        {"input": "[1,2,3]", "output": "6"},
+        {"input": "[]", "output": "0"},
+        {"input": "[10]", "output": "10"},
+        {"input": "[-1,0,1]", "output": "0"}
+    ]
+    return code, tests
+
+def generate_code_repair_max(rng, variant):
+    bug = rng.choice([
+        "if lst:",
+        "max_val = lst[0]",
+        "if x > max_val:",
+        "max_val = x"
+    ])
+    if bug == "if lst:":
+        buggy = "if not lst:"
+    elif bug == "max_val = lst[0]":
+        buggy = "max_val = 0"
+    elif bug == "if x > max_val:":
+        buggy = "if x < max_val:"
+    else:
+        buggy = "max_val = 0"
+    code = f"""
+def find_max(lst):
+    if not lst:
+        return None
+    max_val = lst[0]
+    for x in lst:
+        if x > max_val:
+            max_val = x
+    return max_val
+""".replace(bug, buggy)
+    tests = [
+        {"input": "[1,5,3]", "output": "5"},
+        {"input": "[]", "output": "None"},
+        {"input": "[10]", "output": "10"},
+        {"input": "[-5,-1,-10]", "output": "-1"}
+    ]
+    return code, tests
+
+def generate_code_gen_fizzbuzz(rng, variant):
+    prompt = "Write a program that prints numbers 1 to 100, but for multiples of 3 print 'Fizz', for multiples of 5 print 'Buzz', for multiples of both print 'FizzBuzz'."
+    tests = [
+        {"input": "", "output": "1\\n2\\nFizz\\n4\\nBuzz\\nFizz\\n7\\n8\\nFizz\\nBuzz\\n11\\nFizz\\n13\\n14\\nFizzBuzz\\n16\\n17\\nFizz\\n19\\nBuzz\\nFizz\\n22\\n23\\nFizz\\nBuzz\\n26\\nFizz\\n28\\n29\\nFizzBuzz\\n31\\n32\\nFizz\\n34\\nBuzz\\nFizz\\n37\\n38\\nFizz\\nBuzz\\n41\\nFizz\\n43\\n44\\nFizzBuzz\\n46\\n47\\nFizz\\n49\\nBuzz\\nFizz\\n52\\n53\\nFizz\\nBuzz\\n56\\nFizz\\n58\\n59\\nFizzBuzz\\n61\\n62\\nFizz\\n64\\nBuzz\\nFizz\\n67\\n68\\nFizz\\nBuzz\\n71\\nFizz\\n73\\n74\\nFizzBuzz\\n76\\n77\\nFizz\\n79\\nBuzz\\nFizz\\n82\\n83\\nFizz\\nBuzz\\n86\\nFizz\\n88\\n89\\nFizzBuzz\\n91\\n92\\nFizz\\n94\\nBuzz\\nFizz\\n97\\n98\\nFizz\\nBuzz"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_factorial(rng, variant):
+    prompt = "Write a function factorial(n) that returns n! using recursion."
+    tests = [
+        {"input": "0", "output": "1"},
+        {"input": "1", "output": "1"},
+        {"input": "5", "output": "120"},
+        {"input": "7", "output": "5040"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_palindrome(rng, variant):
+    prompt = "Write a function is_palindrome(s) that returns True if s is a palindrome, else False."
+    tests = [
+        {"input": "'racecar'", "output": "True"},
+        {"input": "'hello'", "output": "False"},
+        {"input": "'a'", "output": "True"},
+        {"input": "'abba'", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sumlist(rng, variant):
+    prompt = "Write a function sum_list(lst) that returns the sum of all numbers in lst."
+    tests = [
+        {"input": "[1,2,3]", "output": "6"},
+        {"input": "[]", "output": "0"},
+        {"input": "[10]", "output": "10"},
+        {"input": "[-1,0,1]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_max(rng, variant):
+    prompt = "Write a function find_max(lst) that returns the maximum value in lst, or None if lst is empty."
+    tests = [
+        {"input": "[1,5,3]", "output": "5"},
+        {"input": "[]", "output": "None"},
+        {"input": "[10]", "output": "10"},
+        {"input": "[-5,-1,-10]", "output": "-1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_prime(rng, variant):
+    prompt = "Write a function is_prime(n) that returns True if n is prime, else False."
+    tests = [
+        {"input": "2", "output": "True"},
+        {"input": "3", "output": "True"},
+        {"input": "4", "output": "False"},
+        {"input": "17", "output": "True"},
+        {"input": "1", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_gcd(rng, variant):
+    prompt = "Write a function gcd(a,b) that returns the greatest common divisor of a and b using Euclidean algorithm."
+    tests = [
+        {"input": "48, 18", "output": "6"},
+        {"input": "101, 103", "output": "1"},
+        {"input": "0, 5", "output": "5"},
+        {"input": "54, 24", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_fibonacci(rng, variant):
+    prompt = "Write a function fib(n) that returns the n-th Fibonacci number (fib(0)=0, fib(1)=1)."
+    tests = [
+        {"input": "0", "output": "0"},
+        {"input": "1", "output": "1"},
+        {"input": "5", "output": "5"},
+        {"input": "10", "output": "55"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_lcm(rng, variant):
+    prompt = "Write a function lcm(a,b) that returns the least common multiple of a and b."
+    tests = [
+        {"input": "4, 6", "output": "12"},
+        {"input": "5, 7", "output": "35"},
+        {"input": "12, 15", "output": "60"},
+        {"input": "1, 8", "output": "8"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sort(rng, variant):
+    prompt = "Write a function bubble_sort(lst) that sorts the list in ascending order using bubble sort."
+    tests = [
+        {"input": "[3,1,2]", "output": "[1, 2, 3]"},
+        {"input": "[]", "output": "[]"},
+        {"input": "[5]", "output": "[5]"},
+        {"input": "[9,8,7,6]", "output": "[6, 7, 8, 9]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_reverse(rng, variant):
+    prompt = "Write a function reverse_string(s) that returns the reverse of s."
+    tests = [
+        {"input": "'hello'", "output": "'olleh'"},
+        {"input": "''", "output": "''"},
+        {"input": "'a'", "output": "'a'"},
+        {"input": "'racecar'", "output": "'racecar'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_power(rng, variant):
+    prompt = "Write a function power(base, exp) that returns base raised to exp (non‑negative integer) using recursion."
+    tests = [
+        {"input": "2, 3", "output": "8"},
+        {"input": "5, 0", "output": "1"},
+        {"input": "3, 1", "output": "3"},
+        {"input": "10, 2", "output": "100"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_matrix_mult(rng, variant):
+    prompt = "Write a function matmul(A,B) that returns the matrix product of A and B (assume valid dimensions)."
+    tests = [
+        {"input": "[[1,2],[3,4]], [[5,6],[7,8]]", "output": "[[19, 22], [43, 50]]"},
+        {"input": "[[1]], [[2]]", "output": "[[2]]"},
+        {"input": "[[1,2,3]], [[4],[5],[6]]", "output": "[[32]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_anagram(rng, variant):
+    prompt = "Write a function are_anagrams(s1, s2) that returns True if s1 and s2 are anagrams, ignoring spaces and case."
+    tests = [
+        {"input": "'listen', 'silent'", "output": "True"},
+        {"input": "'hello', 'world'", "output": "False"},
+        {"input": "'A bc', 'cb a'", "output": "True"},
+        {"input": "'Test', 'test'", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_search(rng, variant):
+    prompt = "Write a function binary_search(arr, x) that returns the index of x in sorted arr, or -1 if not found."
+    tests = [
+        {"input": "[1,2,3,4,5], 3", "output": "2"},
+        {"input": "[1,2,3,4,5], 6", "output": "-1"},
+        {"input": "[], 1", "output": "-1"},
+        {"input": "[10,20,30], 20", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_quicksort(rng, variant):
+    prompt = "Write a function quicksort(lst) that returns a sorted list using quicksort."
+    tests = [
+        {"input": "[3,1,2]", "output": "[1, 2, 3]"},
+        {"input": "[]", "output": "[]"},
+        {"input": "[5]", "output": "[5]"},
+        {"input": "[9,8,7,6]", "output": "[6, 7, 8, 9]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_merge_sort(rng, variant):
+    prompt = "Write a function merge_sort(lst) that returns a sorted list using merge sort."
+    tests = [
+        {"input": "[3,1,2]", "output": "[1, 2, 3]"},
+        {"input": "[]", "output": "[]"},
+        {"input": "[5]", "output": "[5]"},
+        {"input": "[9,8,7,6]", "output": "[6, 7, 8, 9]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_stack(rng, variant):
+    prompt = "Implement a class Stack with push, pop, peek, and is_empty methods."
+    tests = [
+        {"input": "s=Stack(); s.push(1); s.push(2); s.pop()", "output": "2"},
+        {"input": "s=Stack(); s.push(5); s.peek()", "output": "5"},
+        {"input": "s=Stack(); s.is_empty()", "output": "True"},
+        {"input": "s=Stack(); s.push(3); s.pop(); s.is_empty()", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_queue(rng, variant):
+    prompt = "Implement a class Queue with enqueue, dequeue, front, and is_empty methods."
+    tests = [
+        {"input": "q=Queue(); q.enqueue(1); q.enqueue(2); q.dequeue()", "output": "1"},
+        {"input": "q=Queue(); q.enqueue(5); q.front()", "output": "5"},
+        {"input": "q=Queue(); q.is_empty()", "output": "True"},
+        {"input": "q=Queue(); q.enqueue(3); q.dequeue(); q.is_empty()", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_hashmap(rng, variant):
+    prompt = "Implement a class HashMap with put, get, and remove methods using separate chaining."
+    tests = [
+        {"input": "h=HashMap(); h.put('a',1); h.get('a')", "output": "1"},
+        {"input": "h=HashMap(); h.put('b',2); h.remove('b'); h.get('b')", "output": "None"},
+        {"input": "h=HashMap(); h.get('c')", "output": "None"},
+        {"input": "h=HashMap(); h.put('x',10); h.put('x',20); h.get('x')", "output": "20"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_tree_traversal(rng, variant):
+    prompt = "Implement a binary tree node class and functions for inorder, preorder, postorder traversal."
+    tests = [
+        {"input": "root=Node(1); root.left=Node(2); root.right=Node(3); inorder(root)", "output": "[2, 1, 3]"},
+        {"input": "root=Node(1); preorder(root)", "output": "[1]"},
+        {"input": "root=Node(1); root.left=Node(2); postorder(root)", "output": "[2, 1]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_graph_bfs(rng, variant):
+    prompt = "Write a function bfs(graph, start) that returns BFS order as a list of vertices."
+    tests = [
+        {"input": "{0:[1,2],1:[],2:[3]}, 0", "output": "[0, 1, 2, 3]"},
+        {"input": "{1:[2],2:[3],3:[]}, 1", "output": "[1, 2, 3]"},
+        {"input": "{}, 0", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_graph_dfs(rng, variant):
+    prompt = "Write a function dfs(graph, start) that returns DFS order as a list of vertices."
+    tests = [
+        {"input": "{0:[1,2],1:[],2:[3]}, 0", "output": "[0, 1, 2, 3]"},
+        {"input": "{1:[2],2:[3],3:[]}, 1", "output": "[1, 2, 3]"},
+        {"input": "{}, 0", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_dijkstra(rng, variant):
+    prompt = "Write a function dijkstra(graph, start) that returns shortest distances from start to all vertices."
+    tests = [
+        {"input": "{0:{1:1,2:4},1:{2:2},2:{}}, 0", "output": "{0:0,1:1,2:3}"},
+        {"input": "{0:{1:5}}, 0", "output": "{0:0,1:5}"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_knapsack(rng, variant):
+    prompt = "Write a function knapsack(values, weights, capacity) that returns maximum value (0/1 knapsack)."
+    tests = [
+        {"input": "[60,100,120], [10,20,30], 50", "output": "220"},
+        {"input": "[1,2,3], [4,5,1], 4", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_lcs(rng, variant):
+    prompt = "Write a function lcs(s1, s2) that returns length of longest common subsequence."
+    tests = [
+        {"input": "'abcde', 'ace'", "output": "3"},
+        {"input": "'abc', 'def'", "output": "0"},
+        {"input": "'', 'abc'", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_edit_distance(rng, variant):
+    prompt = "Write a function edit_distance(s1, s2) that returns Levenshtein distance."
+    tests = [
+        {"input": "'kitten', 'sitting'", "output": "3"},
+        {"input": "'', 'abc'", "output": "3"},
+        {"input": "'abc', 'abc'", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sieve(rng, variant):
+    prompt = "Write a function sieve(n) that returns list of primes up to n using Sieve of Eratosthenes."
+    tests = [
+        {"input": "10", "output": "[2, 3, 5, 7]"},
+        {"input": "2", "output": "[2]"},
+        {"input": "1", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_permutations(rng, variant):
+    prompt = "Write a function permutations(lst) that returns all permutations of lst."
+    tests = [
+        {"input": "[1,2]", "output": "[[1,2],[2,1]]"},
+        {"input": "[1]", "output": "[[1]]"},
+        {"input": "[]", "output": "[[]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_combinations(rng, variant):
+    prompt = "Write a function combinations(lst, k) that returns all k‑combinations of lst."
+    tests = [
+        {"input": "[1,2,3], 2", "output": "[[1,2],[1,3],[2,3]]"},
+        {"input": "[1], 1", "output": "[[1]]"},
+        {"input": "[], 0", "output": "[[]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_trie(rng, variant):
+    prompt = "Implement a Trie class with insert, search, and starts_with methods."
+    tests = [
+        {"input": "t=Trie(); t.insert('apple'); t.search('apple')", "output": "True"},
+        {"input": "t=Trie(); t.insert('app'); t.starts_with('ap')", "output": "True"},
+        {"input": "t=Trie(); t.search('app')", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_lru_cache(rng, variant):
+    prompt = "Implement a LRUCache class with get and put methods (capacity fixed)."
+    tests = [
+        {"input": "c=LRUCache(2); c.put(1,1); c.put(2,2); c.get(1)", "output": "1"},
+        {"input": "c=LRUCache(2); c.put(1,1); c.put(2,2); c.put(3,3); c.get(1)", "output": "-1"},
+        {"input": "c=LRUCache(1); c.put(1,1); c.put(2,2); c.get(1)", "output": "-1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_atoi(rng, variant):
+    prompt = "Write a function atoi(s) that converts string to integer (like C's atoi)."
+    tests = [
+        {"input": "'42'", "output": "42"},
+        {"input": "'   -42'", "output": "-42"},
+        {"input": "'4193 with words'", "output": "4193"},
+        {"input": "'words and 987'", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_regex(rng, variant):
+    prompt = "Write a function is_match(pattern, s) that returns True if s matches pattern ('.' matches any char, '*' matches zero or more of preceding)."
+    tests = [
+        {"input": "'a.b', 'acb'", "output": "True"},
+        {"input": "'a*', 'aaa'", "output": "True"},
+        {"input": "'a.*b', 'axxxxxb'", "output": "True"},
+        {"input": "'a.b', 'ab'", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_interval_merge(rng, variant):
+    prompt = "Write a function merge_intervals(intervals) that merges overlapping intervals."
+    tests = [
+        {"input": "[[1,3],[2,6],[8,10],[15,18]]", "output": "[[1,6],[8,10],[15,18]]"},
+        {"input": "[[1,4],[4,5]]", "output": "[[1,5]]"},
+        {"input": "[]", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_pascal(rng, variant):
+    prompt = "Write a function generate_pascal(n) that returns first n rows of Pascal's triangle."
+    tests = [
+        {"input": "5", "output": "[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]"},
+        {"input": "1", "output": "[[1]]"},
+        {"input": "0", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_spiral_matrix(rng, variant):
+    prompt = "Write a function spiral_order(matrix) that returns elements in spiral order."
+    tests = [
+        {"input": "[[1,2,3],[4,5,6],[7,8,9]]", "output": "[1,2,3,6,9,8,7,4,5]"},
+        {"input": "[[1]]", "output": "[1]"},
+        {"input": "[]", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_rotate_image(rng, variant):
+    prompt = "Write a function rotate_image(matrix) that rotates n×n matrix 90 degrees clockwise in‑place."
+    tests = [
+        {"input": "[[1,2],[3,4]]", "output": "[[3,1],[4,2]]"},
+        {"input": "[[1]]", "output": "[[1]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_valid_parentheses(rng, variant):
+    prompt = "Write a function is_valid(s) that returns True if parentheses in s are correctly matched."
+    tests = [
+        {"input": "'()'", "output": "True"},
+        {"input": "'()[]{}'", "output": "True"},
+        {"input": "'(]'", "output": "False"},
+        {"input": "'([)]'", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_min_window_substring(rng, variant):
+    prompt = "Write a function min_window(s, t) that returns smallest substring of s containing all chars of t."
+    tests = [
+        {"input": "'ADOBECODEBANC', 'ABC'", "output": "'BANC'"},
+        {"input": "'a', 'a'", "output": "'a'"},
+        {"input": "'a', 'aa'", "output": "''"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_trapping_rain_water(rng, variant):
+    prompt = "Write a function trap(height) that returns total trapped rainwater."
+    tests = [
+        {"input": "[0,1,0,2,1,0,1,3,2,1,2,1]", "output": "6"},
+        {"input": "[4,2,0,3,2,5]", "output": "9"},
+        {"input": "[]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_palindrome_substring(rng, variant):
+    prompt = "Write a function longest_palindrome(s) that returns the longest palindromic substring."
+    tests = [
+        {"input": "'babad'", "output": "'bab'"},
+        {"input": "'cbbd'", "output": "'bb'"},
+        {"input": "'a'", "output": "'a'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_word_break(rng, variant):
+    prompt = "Write a function word_break(s, word_dict) that returns True if s can be segmented into dictionary words."
+    tests = [
+        {"input": "'leetcode', ['leet','code']", "output": "True"},
+        {"input": "'applepenapple', ['apple','pen']", "output": "True"},
+        {"input": "'catsandog', ['cats','dog','sand','and','cat']", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change(rng, variant):
+    prompt = "Write a function coin_change(coins, amount) that returns fewest coins to make amount, or -1."
+    tests = [
+        {"input": "[1,2,5], 11", "output": "3"},
+        {"input": "[2], 3", "output": "-1"},
+        {"input": "[1], 0", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum(rng, variant):
+    prompt = "Write a function subset_sum(nums, target) that returns True if any subset sums to target."
+    tests = [
+        {"input": "[3,34,4,12,5,2], 9", "output": "True"},
+        {"input": "[1,2,3], 7", "output": "False"},
+        {"input": "[], 0", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_n_queens(rng, variant):
+    prompt = "Write a function solve_n_queens(n) that returns all distinct solutions to n‑queens."
+    tests = [
+        {"input": "4", "output": "[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]"},
+        {"input": "1", "output": "[['Q']]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sudoku_solver(rng, variant):
+    prompt = "Write a function solve_sudoku(board) that solves 9×9 Sudoku in‑place."
+    tests = [
+        {"input": "[['5','3','.','.','7','.','.','.','.'],['6','.','.','1','9','5','.','.','.'],['.','9','8','.','.','.','.','6','.'],['8','.','.','.','6','.','.','.','3'],['4','.','.','8','.','3','.','.','1'],['7','.','.','.','2','.','.','.','6'],['.','6','.','.','.','.','2','8','.'],['.','.','.','4','1','9','.','.','5'],['.','.','.','.','8','.','.','7','9']]", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_expression_add_operators(rng, variant):
+    prompt = "Write a function add_operators(num, target) that returns all ways to insert +‑* to get target."
+    tests = [
+        {"input": "'123', 6", "output": "['1+2+3','1*2*3']"},
+        {"input": "'105', 5", "output": "['1*0+5','10‑5']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_serialize_deserialize_tree(rng, variant):
+    prompt = "Write functions serialize(root) and deserialize(data) for a binary tree."
+    tests = [
+        {"input": "root=Node(1); root.left=Node(2); root.right=Node(3); deserialize(serialize(root)).val", "output": "1"},
+        {"input": "deserialize(serialize(None))", "output": "None"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_kth_largest(rng, variant):
+    prompt = "Write a class KthLargest with add(val) returning k‑th largest in stream."
+    tests = [
+        {"input": "k=KthLargest(3,[4,5,8,2]); k.add(3); k.add(5); k.add(10); k.add(9); k.add(4)", "output": "[4,5,5,8,8]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_median_stream(rng, variant):
+    prompt = "Write a class MedianFinder with addNum and findMedian."
+    tests = [
+        {"input": "m=MedianFinder(); m.addNum(1); m.addNum(2); m.findMedian()", "output": "1.5"},
+        {"input": "m=MedianFinder(); m.addNum(1); m.addNum(2); m.addNum(3); m.findMedian()", "output": "2.0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_randomized_set(rng, variant):
+    prompt = "Implement RandomizedSet with insert, remove, getRandom (O(1) average)."
+    tests = [
+        {"input": "rs=RandomizedSet(); rs.insert(1); rs.remove(2); rs.insert(2); rs.getRandom() in [1,2]", "output": "True"},
+        {"input": "rs=RandomizedSet(); rs.remove(1)", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_calculator(rng, variant):
+    prompt = "Write a function calculate(s) that evaluates arithmetic expression with +‑*/ and parentheses."
+    tests = [
+        {"input": "'3+2*2'", "output": "7"},
+        {"input": "'(1+(4+5+2)‑3)+(6+8)'", "output": "23"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_text_justification(rng, variant):
+    prompt = "Write a function full_justify(words, maxWidth) that justifies text."
+    tests = [
+        {"input": "['This','is','an','example','of','text','justification.'], 16", "output": "['This    is    an','example  of text','justification.  ']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_regex_matching(rng, variant):
+    prompt = "Write a function is_match_regex(s, p) that matches '.' and '*' (full string)."
+    tests = [
+        {"input": "'aa', 'a'", "output": "False"},
+        {"input": "'aa', 'a*'", "output": "True"},
+        {"input": "'ab', '.*'", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_wildcard_matching(rng, variant):
+    prompt = "Write a function is_match_wildcard(s, p) where '?' matches any single char, '*' matches any sequence."
+    tests = [
+        {"input": "'aa', 'a'", "output": "False"},
+        {"input": "'aa', '*'", "output": "True"},
+        {"input": "'cb', '?a'", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_valid_parentheses(rng, variant):
+    prompt = "Write a function longest_valid_parentheses(s) that returns length of longest valid parentheses substring."
+    tests = [
+        {"input": "'(()'", "output": "2"},
+        {"input": "')()())'", "output": "4"},
+        {"input": "''", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_count_and_say(rng, variant):
+    prompt = "Write a function count_and_say(n) that returns n‑th term of count‑and‑say sequence."
+    tests = [
+        {"input": "1", "output": "'1'"},
+        {"input": "4", "output": "'1211'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_zigzag_conversion(rng, variant):
+    prompt = "Write a function convert(s, numRows) that returns zigzag conversion."
+    tests = [
+        {"input": "'PAYPALISHIRING', 3", "output": "'PAHNAPLSIIGYIR'"},
+        {"input": "'A', 1", "output": "'A'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_integer_to_roman(rng, variant):
+    prompt = "Write a function int_to_roman(num) that converts integer to Roman numeral."
+    tests = [
+        {"input": "3", "output": "'III'"},
+        {"input": "58", "output": "'LVIII'"},
+        {"input": "1994", "output": "'MCMXCIV'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_roman_to_integer(rng, variant):
+    prompt = "Write a function roman_to_int(s) that converts Roman numeral to integer."
+    tests = [
+        {"input": "'III'", "output": "3"},
+        {"input": "'LVIII'", "output": "58"},
+        {"input": "'MCMXCIV'", "output": "1994"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_atoi_strict(rng, variant):
+    prompt = "Write a function my_atoi(s) that implements 32‑bit signed integer conversion with clamping."
+    tests = [
+        {"input": "'42'", "output": "42"},
+        {"input": "'   ‑42'", "output": "‑42"},
+        {"input": "'4193 with words'", "output": "4193"},
+        {"input": "'‑91283472332'", "output": "‑2147483648"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_pow(rng, variant):
+    prompt = "Write a function my_pow(x, n) that computes x raised to n (n can be negative)."
+    tests = [
+        {"input": "2.0, 10", "output": "1024.0"},
+        {"input": "2.1, 3", "output": "9.261"},
+        {"input": "2.0, ‑2", "output": "0.25"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sqrt(rng, variant):
+    prompt = "Write a function my_sqrt(x) that returns integer square root (floor)."
+    tests = [
+        {"input": "4", "output": "2"},
+        {"input": "8", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_divide(rng, variant):
+    prompt = "Write a function divide(dividend, divisor) that divides integers without using * / %."
+    tests = [
+        {"input": "10, 3", "output": "3"},
+        {"input": "7, ‑3", "output": "‑2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_fraction_to_decimal(rng, variant):
+    prompt = "Write a function fraction_to_decimal(numerator, denominator) that returns string with repeating part in parentheses."
+    tests = [
+        {"input": "1, 2", "output": "'0.5'"},
+        {"input": "2, 1", "output": "'2'"},
+        {"input": "4, 333", "output": "'0.(012)'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_max_points_on_line(rng, variant):
+    prompt = "Write a function max_points(points) that returns maximum number of points on a straight line."
+    tests = [
+        {"input": "[[1,1],[2,2],[3,3]]", "output": "3"},
+        {"input": "[[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_evaluate_reverse_polish(rng, variant):
+    prompt = "Write a function eval_rpn(tokens) that evaluates Reverse Polish Notation."
+    tests = [
+        {"input": "['2','1','+','3','*']", "output": "9"},
+        {"input": "['4','13','5','/','+']", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_basic_calculator_ii(rng, variant):
+    prompt = "Write a function calculate_ii(s) that evaluates arithmetic expression with +‑*/ (no parentheses)."
+    tests = [
+        {"input": "'3+2*2'", "output": "7"},
+        {"input": "' 3/2 '", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_basic_calculator_iii(rng, variant):
+    prompt = "Write a function calculate_iii(s) that evaluates arithmetic expression with +‑*/ and parentheses."
+    tests = [
+        {"input": "'(2+6*3+5‑(3*14/7+2)*5)+3'", "output": "‑12"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_decode_string(rng, variant):
+    prompt = "Write a function decode_string(s) that expands k[encoded_string]."
+    tests = [
+        {"input": "'3[a]2[bc]'", "output": "'aaabcbc'"},
+        {"input": "'3[a2[c]]'", "output": "'accaccacc'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_remove_invalid_parentheses(rng, variant):
+    prompt = "Write a function remove_invalid_parentheses(s) that returns all valid strings with minimum removals."
+    tests = [
+        {"input": "'()())()'", "output": "['(())()','()()()']"},
+        {"input": "'(a)())()'", "output": "['(a())()','(a)()()']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_window_subsequence(rng, variant):
+    prompt = "Write a function min_window_subsequence(s, t) that returns shortest substring of s where t is a subsequence."
+    tests = [
+        {"input": "'abcdebdde', 'bde'", "output": "'bcde'"},
+        {"input": "'jmeqksfrsdcmsiwvaovztaqenprpvnbstl', 'u'", "output": "''"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sliding_window_maximum(rng, variant):
+    prompt = "Write a function max_sliding_window(nums, k) that returns max sliding window."
+    tests = [
+        {"input": "[1,3,‑1,‑3,5,3,6,7], 3", "output": "[3,3,5,5,6,7]"},
+        {"input": "[1], 1", "output": "[1]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_size_subarray_sum(rng, variant):
+    prompt = "Write a function min_subarray_len(target, nums) that returns minimal length subarray sum ≥ target."
+    tests = [
+        {"input": "7, [2,3,1,2,4,3]", "output": "2"},
+        {"input": "11, [1,1,1,1,1,1,1,1]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subarray_sum_equals_k(rng, variant):
+    prompt = "Write a function subarray_sum(nums, k) that returns total number of subarrays summing to k."
+    tests = [
+        {"input": "[1,1,1], 2", "output": "2"},
+        {"input": "[1,2,3], 3", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_substring_without_repeating(rng, variant):
+    prompt = "Write a function length_of_longest_substring(s) that returns length of longest substring without repeating chars."
+    tests = [
+        {"input": "'abcabcbb'", "output": "3"},
+        {"input": "'bbbbb'", "output": "1"},
+        {"input": "'pwwkew'", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_substring_with_at_most_two_distinct(rng, variant):
+    prompt = "Write a function length_of_longest_substring_two_distinct(s) that returns length with at most two distinct chars."
+    tests = [
+        {"input": "'eceba'", "output": "3"},
+        {"input": "'ccaabbb'", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_substring_with_at_most_k_distinct(rng, variant):
+    prompt = "Write a function length_of_longest_substring_k_distinct(s, k) that returns length with at most k distinct chars."
+    tests = [
+        {"input": "'eceba', 2", "output": "3"},
+        {"input": "'aa', 1", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_window_substring_two(rng, variant):
+    prompt = "Write a function min_window_two(s, t) that returns smallest substring of s containing all chars of t (order irrelevant)."
+    tests = [
+        {"input": "'ADOBECODEBANC', 'ABC'", "output": "'BANC'"},
+        {"input": "'a', 'a'", "output": "'a'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_permutation_in_string(rng, variant):
+    prompt = "Write a function check_inclusion(s1, s2) that returns True if s2 contains a permutation of s1."
+    tests = [
+        {"input": "'ab', 'eidbaooo'", "output": "True"},
+        {"input": "'ab', 'eidboaoo'", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_find_all_anagrams(rng, variant):
+    prompt = "Write a function find_anagrams(s, p) that returns start indices of p's anagrams in s."
+    tests = [
+        {"input": "'cbaebabacd', 'abc'", "output": "[0,6]"},
+        {"input": "'abab', 'ab'", "output": "[0,1,2]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_repeating_character_replacement(rng, variant):
+    prompt = "Write a function character_replacement(s, k) that returns length of longest substring after at most k replacements."
+    tests = [
+        {"input": "'ABAB', 2", "output": "4"},
+        {"input": "'AABABBA', 1", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_palindromic_substrings(rng, variant):
+    prompt = "Write a function count_substrings(s) that returns number of palindromic substrings."
+    tests = [
+        {"input": "'abc'", "output": "3"},
+        {"input": "'aaa'", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_palindromic_subsequence(rng, variant):
+    prompt = "Write a function longest_palindrome_subseq(s) that returns length of longest palindromic subsequence."
+    tests = [
+        {"input": "'bbbab'", "output": "4"},
+        {"input": "'cbbd'", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_edit_distance_two(rng, variant):
+    prompt = "Write a function min_distance(word1, word2) that returns minimum edit distance (insert, delete, replace)."
+    tests = [
+        {"input": "'horse', 'ros'", "output": "3"},
+        {"input": "'intention', 'execution'", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_wildcard_matching_two(rng, variant):
+    prompt = "Write a function is_match_wildcard_two(s, p) where '?' matches any single char, '*' matches any sequence."
+    tests = [
+        {"input": "'aa', 'a'", "output": "False"},
+        {"input": "'aa', '*'", "output": "True"},
+        {"input": "'cb', '?a'", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_regular_expression_matching_two(rng, variant):
+    prompt = "Write a function is_match_regex_two(s, p) that matches '.' and '*' (full string)."
+    tests = [
+        {"input": "'aa', 'a'", "output": "False"},
+        {"input": "'aa', 'a*'", "output": "True"},
+        {"input": "'ab', '.*'", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_burst_balloons(rng, variant):
+    prompt = "Write a function max_coins(nums) that returns maximum coins from bursting balloons."
+    tests = [
+        {"input": "[3,1,5,8]", "output": "167"},
+        {"input": "[1,5]", "output": "10"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_super_egg_drop(rng, variant):
+    prompt = "Write a function super_egg_drop(k, n) that returns minimum moves to determine critical floor."
+    tests = [
+        {"input": "1, 2", "output": "2"},
+        {"input": "2, 6", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_word_break_ii(rng, variant):
+    prompt = "Write a function word_break_ii(s, word_dict) that returns all possible sentences."
+    tests = [
+        {"input": "'catsanddog', ['cat','cats','and','sand','dog']", "output": "['cats and dog','cat sand dog']"},
+        {"input": "'pineapplepenapple', ['apple','pen','applepen','pine','pineapple']", "output": "['pine apple pen apple','pineapple pen apple','pine applepen apple']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_word_search_ii(rng, variant):
+    prompt = "Write a function find_words(board, words) that returns all words from dictionary on board."
+    tests = [
+        {"input": "[['o','a','a','n'],['e','t','a','e'],['i','h','k','r'],['i','f','l','v']], ['oath','pea','eat','rain']", "output": "['eat','oath']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_alien_dictionary(rng, variant):
+    prompt = "Write a function alien_order(words) that returns order of letters in alien language."
+    tests = [
+        {"input": "['wrt','wrf','er','ett','rftt']", "output": "'wertf'"},
+        {"input": "['z','x']", "output": "'zx'"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_course_schedule(rng, variant):
+    prompt = "Write a function can_finish(num_courses, prerequisites) that returns True if schedule possible."
+    tests = [
+        {"input": "2, [[1,0]]", "output": "True"},
+        {"input": "2, [[1,0],[0,1]]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_course_schedule_ii(rng, variant):
+    prompt = "Write a function find_order(num_courses, prerequisites) that returns course order."
+    tests = [
+        {"input": "2, [[1,0]]", "output": "[0,1]"},
+        {"input": "4, [[1,0],[2,0],[3,1],[3,2]]", "output": "[0,1,2,3]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sequence_reconstruction(rng, variant):
+    prompt = "Write a function sequence_reconstruction(org, seqs) that returns True if org uniquely reconstructible."
+    tests = [
+        {"input": "[1,2,3], [[1,2],[1,3],[2,3]]", "output": "True"},
+        {"input": "[1,2,3], [[1,2],[1,3]]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_height_trees(rng, variant):
+    prompt = "Write a function find_min_height_trees(n, edges) that returns roots of MHTs."
+    tests = [
+        {"input": "4, [[1,0],[1,2],[1,3]]", "output": "[1]"},
+        {"input": "6, [[3,0],[3,1],[3,2],[3,4],[5,4]]", "output": "[3,4]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_reconstruct_itinerary(rng, variant):
+    prompt = "Write a function find_itinerary(tickets) that returns itinerary in lexical order."
+    tests = [
+        {"input": "[['MUC','LHR'],['JFK','MUC'],['SFO','SJC'],['LHR','SFO']]", "output": "['JFK','MUC','LHR','SFO','SJC']"},
+        {"input": "[['JFK','SFO'],['JFK','ATL'],['SFO','ATL'],['ATL','JFK'],['ATL','SFO']]", "output": "['JFK','ATL','JFK','SFO','ATL','SFO']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_cheapest_flights_within_k_stops(rng, variant):
+    prompt = "Write a function find_cheapest_price(n, flights, src, dst, k) that returns cheapest price with at most k stops."
+    tests = [
+        {"input": "3, [[0,1,100],[1,2,100],[0,2,500]], 0, 2, 1", "output": "200"},
+        {"input": "3, [[0,1,100],[1,2,100],[0,2,500]], 0, 2, 0", "output": "500"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_network_delay_time(rng, variant):
+    prompt = "Write a function network_delay_time(times, n, k) that returns time for all nodes to receive signal."
+    tests = [
+        {"input": "[[2,1,1],[2,3,1],[3,4,1]], 4, 2", "output": "2"},
+        {"input": "[[1,2,1]], 2, 1", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_swim_in_rising_water(rng, variant):
+    prompt = "Write a function swim_in_water(grid) that returns least time to reach bottom‑right."
+    tests = [
+        {"input": "[[0,2],[1,3]]", "output": "3"},
+        {"input": "[[0,1,2,3,4],[24,23,22,21,5],[12,13,14,15,16],[11,17,18,19,20],[10,9,8,7,6]]", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sliding_puzzle(rng, variant):
+    prompt = "Write a function sliding_puzzle(board) that returns minimum moves to solve 2×3 puzzle."
+    tests = [
+        {"input": "[[1,2,3],[4,0,5]]", "output": "1"},
+        {"input": "[[1,2,3],[5,4,0]]", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_open_the_lock(rng, variant):
+    prompt = "Write a function open_lock(deadends, target) that returns minimum turns to open lock."
+    tests = [
+        {"input": "['0201','0101','0102','1212','2002'], '0202'", "output": "6"},
+        {"input": "['8888'], '0009'", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_shortest_path_in_binary_matrix(rng, variant):
+    prompt = "Write a function shortest_path_binary_matrix(grid) that returns shortest clear path length."
+    tests = [
+        {"input": "[[0,1],[1,0]]", "output": "2"},
+        {"input": "[[0,0,0],[1,1,0],[1,1,0]]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_shortest_path_with_obstacles_elimination(rng, variant):
+    prompt = "Write a function shortest_path(grid, k) that returns shortest path with at most k obstacle eliminations."
+    tests = [
+        {"input": "[[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]], 1", "output": "6"},
+        {"input": "[[0,1,1],[1,1,1],[1,0,0]], 1", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_cut_off_trees_for_golf_event(rng, variant):
+    prompt = "Write a function cut_off_tree(forest) that returns minimum steps to cut all trees in order."
+    tests = [
+        {"input": "[[1,2,3],[0,0,4],[7,6,5]]", "output": "6"},
+        {"input": "[[1,2,3],[0,0,0],[7,6,5]]", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_word_ladder(rng, variant):
+    prompt = "Write a function ladder_length(begin_word, end_word, word_list) that returns shortest transformation length."
+    tests = [
+        {"input": "'hit', 'cog', ['hot','dot','dog','lot','log','cog']", "output": "5"},
+        {"input": "'hit', 'cog', ['hot','dot','dog','lot','log']", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_word_ladder_ii(rng, variant):
+    prompt = "Write a function find_ladders(begin_word, end_word, word_list) that returns all shortest transformations."
+    tests = [
+        {"input": "'hit', 'cog', ['hot','dot','dog','lot','log','cog']", "output": "[['hit','hot','dot','dog','cog'],['hit','hot','lot','log','cog']]"},
+        {"input": "'hit', 'cog', ['hot','dot','dog','lot','log']", "output": "[]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_surrounded_regions(rng, variant):
+    prompt = "Write a function solve(board) that captures surrounded 'O's to 'X's."
+    tests = [
+        {"input": "[['X','X','X','X'],['X','O','O','X'],['X','X','O','X'],['X','O','X','X']]", "output": "[['X','X','X','X'],['X','X','X','X'],['X','X','X','X'],['X','O','X','X']]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_number_of_islands(rng, variant):
+    prompt = "Write a function num_islands(grid) that returns number of islands (1's)."
+    tests = [
+        {"input": "[['1','1','1','1','0'],['1','1','0','1','0'],['1','1','0','0','0'],['0','0','0','0','0']]", "output": "1"},
+        {"input": "[['1','1','0','0','0'],['1','1','0','0','0'],['0','0','1','0','0'],['0','0','0','1','1']]", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_max_area_of_island(rng, variant):
+    prompt = "Write a function max_area_of_island(grid) that returns maximum area of island."
+    tests = [
+        {"input": "[[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_island_perimeter(rng, variant):
+    prompt = "Write a function island_perimeter(grid) that returns perimeter of island."
+    tests = [
+        {"input": "[[0,1,0,0],[1,1,1,0],[0,1,0,0],[1,1,0,0]]", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_pacific_atlantic_water_flow(rng, variant):
+    prompt = "Write a function pacific_atlantic(heights) that returns cells where water can flow to both oceans."
+    tests = [
+        {"input": "[[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]", "output": "[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_rotting_oranges(rng, variant):
+    prompt = "Write a function oranges_rotting(grid) that returns minutes until no fresh oranges."
+    tests = [
+        {"input": "[[2,1,1],[1,1,0],[0,1,1]]", "output": "4"},
+        {"input": "[[2,1,1],[0,1,1],[1,0,1]]", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_walls_and_gates(rng, variant):
+    prompt = "Write a function walls_and_gates(rooms) that fills each empty room with distance to nearest gate."
+    tests = [
+        {"input": "[[2147483647,‑1,0,2147483647],[2147483647,2147483647,2147483647,‑1],[2147483647,‑1,2147483647,‑1],[0,‑1,2147483647,2147483647]]", "output": "[[3,‑1,0,1],[2,2,1,‑1],[1,‑1,2,‑1],[0,‑1,3,4]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_snakes_and_ladders(rng, variant):
+    prompt = "Write a function snakes_and_ladders(board) that returns minimum moves to reach end."
+    tests = [
+        {"input": "[[‑1,‑1,‑1,‑1,‑1,‑1],[‑1,‑1,‑1,‑1,‑1,‑1],[‑1,‑1,‑1,‑1,‑1,‑1],[‑1,35,‑1,‑1,13,‑1],[‑1,‑1,‑1,‑1,‑1,‑1],[‑1,15,‑1,‑1,‑1,‑1]]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_employee_importance(rng, variant):
+    prompt = "Write a function get_importance(employees, id) that returns total importance of employee and subordinates."
+    tests = [
+        {"input": "[[1,5,[2,3]],[2,3,[]],[3,3,[]]], 1", "output": "11"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_friend_circles(rng, variant):
+    prompt = "Write a function find_circle_num(is_connected) that returns number of friend circles."
+    tests = [
+        {"input": "[[1,1,0],[1,1,0],[0,0,1]]", "output": "2"},
+        {"input": "[[1,0,0],[0,1,0],[0,0,1]]", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_redundant_connection(rng, variant):
+    prompt = "Write a function find_redundant_connection(edges) that returns edge that creates cycle."
+    tests = [
+        {"input": "[[1,2],[1,3],[2,3]]", "output": "[2,3]"},
+        {"input": "[[1,2],[2,3],[3,4],[1,4],[1,5]]", "output": "[1,4]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_accounts_merge(rng, variant):
+    prompt = "Write a function accounts_merge(accounts) that merges accounts with common emails."
+    tests = [
+        {"input": "[['John','johnsmith@mail.com','john_newyork@mail.com'],['John','johnsmith@mail.com','john00@mail.com'],['Mary','mary@mail.com'],['John','johnnybravo@mail.com']]", "output": "[['John','john00@mail.com','john_newyork@mail.com','johnsmith@mail.com'],['Mary','mary@mail.com'],['John','johnnybravo@mail.com']]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_number_of_connected_components(rng, variant):
+    prompt = "Write a function count_components(n, edges) that returns number of connected components."
+    tests = [
+        {"input": "5, [[0,1],[1,2],[3,4]]", "output": "2"},
+        {"input": "5, [[0,1],[1,2],[2,3],[3,4]]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_graph_valid_tree(rng, variant):
+    prompt = "Write a function valid_tree(n, edges) that returns True if edges form a valid tree."
+    tests = [
+        {"input": "5, [[0,1],[0,2],[0,3],[1,4]]", "output": "True"},
+        {"input": "5, [[0,1],[1,2],[2,3],[1,3],[1,4]]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_consecutive_sequence(rng, variant):
+    prompt = "Write a function longest_consecutive(nums) that returns length of longest consecutive sequence."
+    tests = [
+        {"input": "[100,4,200,1,3,2]", "output": "4"},
+        {"input": "[0,3,7,2,5,8,4,6,0,1]", "output": "9"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_find_celebrity(rng, variant):
+    prompt = "Write a function find_celebrity(n) that returns celebrity label (‑1 if none)."
+    tests = [
+        {"input": "3, [[1,1,0],[0,1,0],[1,1,1]]", "output": "1"},
+        {"input": "3, [[1,0,1],[1,1,0],[0,1,1]]", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_task_scheduler(rng, variant):
+    prompt = "Write a function least_interval(tasks, n) that returns least intervals to finish tasks."
+    tests = [
+        {"input": "['A','A','A','B','B','B'], 2", "output": "8"},
+        {"input": "['A','A','A','B','B','B'], 0", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_reorganize_string(rng, variant):
+    prompt = "Write a function reorganize_string(s) that returns rearranged string with no adjacent same chars."
+    tests = [
+        {"input": "'aab'", "output": "'aba'"},
+        {"input": "'aaab'", "output": "''"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_rearrange_string_k_distance(rng, variant):
+    prompt = "Write a function rearrange_string(s, k) that returns rearranged string with same chars at least k apart."
+    tests = [
+        {"input": "'aabbcc', 3", "output": "'abcabc'"},
+        {"input": "'aaabc', 3", "output": "''"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_meeting_rooms(rng, variant):
+    prompt = "Write a function can_attend_meetings(intervals) that returns True if no overlap."
+    tests = [
+        {"input": "[[0,30],[5,10],[15,20]]", "output": "False"},
+        {"input": "[[7,10],[2,4]]", "output": "True"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_meeting_rooms_ii(rng, variant):
+    prompt = "Write a function min_meeting_rooms(intervals) that returns minimum rooms needed."
+    tests = [
+        {"input": "[[0,30],[5,10],[15,20]]", "output": "2"},
+        {"input": "[[7,10],[2,4]]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_merge_intervals(rng, variant):
+    prompt = "Write a function merge_intervals(intervals) that merges overlapping intervals."
+    tests = [
+        {"input": "[[1,3],[2,6],[8,10],[15,18]]", "output": "[[1,6],[8,10],[15,18]]"},
+        {"input": "[[1,4],[4,5]]", "output": "[[1,5]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_insert_interval(rng, variant):
+    prompt = "Write a function insert_interval(intervals, new_interval) that inserts and merges."
+    tests = [
+        {"input": "[[1,3],[6,9]], [2,5]", "output": "[[1,5],[6,9]]"},
+        {"input": "[[1,2],[3,5],[6,7],[8,10],[12,16]], [4,8]", "output": "[[1,2],[3,10],[12,16]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_non_overlapping_intervals(rng, variant):
+    prompt = "Write a function erase_overlap_intervals(intervals) that returns minimum removals to make non‑overlapping."
+    tests = [
+        {"input": "[[1,2],[2,3],[3,4],[1,3]]", "output": "1"},
+        {"input": "[[1,2],[1,2],[1,2]]", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_interval_to_include_each_query(rng, variant):
+    prompt = "Write a function min_interval(intervals, queries) that returns smallest interval size containing each query."
+    tests = [
+        {"input": "[[1,4],[2,4],[3,6],[5,7]], [2,3,4,5]", "output": "[3,3,1,3]"},
+        {"input": "[[2,3],[2,5],[1,8],[20,25]], [2,19,5,22]", "output": "[2,‑1,4,6]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_data_stream_as_disjoint_intervals(rng, variant):
+    prompt = "Write a class SummaryRanges with addNum and getIntervals."
+    tests = [
+        {"input": "sr=SummaryRanges(); sr.addNum(1); sr.addNum(3); sr.addNum(7); sr.addNum(2); sr.addNum(6); sr.getIntervals()", "output": "[[1,3],[6,7]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_find_median_from_data_stream(rng, variant):
+    prompt = "Write a class MedianFinder with addNum and findMedian."
+    tests = [
+        {"input": "mf=MedianFinder(); mf.addNum(1); mf.addNum(2); mf.findMedian()", "output": "1.5"},
+        {"input": "mf=MedianFinder(); mf.addNum(1); mf.addNum(2); mf.addNum(3); mf.findMedian()", "output": "2.0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sliding_window_median(rng, variant):
+    prompt = "Write a function median_sliding_window(nums, k) that returns median of each sliding window."
+    tests = [
+        {"input": "[1,3,‑1,‑3,5,3,6,7], 3", "output": "[1.0,‑1.0,‑1.0,3.0,5.0,6.0]"},
+        {"input": "[1], 1", "output": "[1.0]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_range_sum_query_mutable(rng, variant):
+    prompt = "Write a class NumArray with update and sumRange (segment tree or BIT)."
+    tests = [
+        {"input": "na=NumArray([1,3,5]); na.sumRange(0,2); na.update(1,2); na.sumRange(0,2)", "output": "[9,8]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_range_sum_query_2d_mutable(rng, variant):
+    prompt = "Write a class NumMatrix with update and sumRegion."
+    tests = [
+        {"input": "nm=NumMatrix([[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]]); nm.sumRegion(2,1,4,3); nm.update(3,2,2); nm.sumRegion(2,1,4,3)", "output": "[8,10]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_count_of_smaller_numbers_after_self(rng, variant):
+    prompt = "Write a function count_smaller(nums) that returns counts of smaller elements to the right."
+    tests = [
+        {"input": "[5,2,6,1]", "output": "[2,1,1,0]"},
+        {"input": "[‑1]", "output": "[0]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_count_of_range_sum(rng, variant):
+    prompt = "Write a function count_range_sum(nums, lower, upper) that returns number of range sums in [lower, upper]."
+    tests = [
+        {"input": "[‑2,5,‑1], ‑2, 2", "output": "3"},
+        {"input": "[0], 0, 0", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_reverse_pairs(rng, variant):
+    prompt = "Write a function reverse_pairs(nums) that returns number of reverse pairs (i<j and nums[i]>2*nums[j])."
+    tests = [
+        {"input": "[1,3,2,3,1]", "output": "2"},
+        {"input": "[2,4,3,5,1]", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_skyline_problem(rng, variant):
+    prompt = "Write a function get_skyline(buildings) that returns skyline key points."
+    tests = [
+        {"input": "[[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]", "output": "[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_the_skyline_problem_two(rng, variant):
+    prompt = "Write a function get_skyline_two(buildings) that returns skyline key points (optimized)."
+    tests = [
+        {"input": "[[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]", "output": "[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_trapping_rain_water_two(rng, variant):
+    prompt = "Write a function trap_rain_water(height_map) that returns total trapped rainwater in 2D."
+    tests = [
+        {"input": "[[1,4,3,1,3,2],[3,2,1,3,2,4],[2,3,3,2,3,1]]", "output": "4"},
+        {"input": "[[3,3,3,3,3],[3,2,2,2,3],[3,2,1,2,3],[3,2,2,2,3],[3,3,3,3,3]]", "output": "10"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_largest_rectangle_in_histogram(rng, variant):
+    prompt = "Write a function largest_rectangle_area(heights) that returns area of largest rectangle."
+    tests = [
+        {"input": "[2,1,5,6,2,3]", "output": "10"},
+        {"input": "[2,4]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximal_rectangle(rng, variant):
+    prompt = "Write a function maximal_rectangle(matrix) that returns area of largest rectangle of 1's."
+    tests = [
+        {"input": "[['1','0','1','0','0'],['1','0','1','1','1'],['1','1','1','1','1'],['1','0','0','1','0']]", "output": "6"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximal_square(rng, variant):
+    prompt = "Write a function maximal_square(matrix) that returns area of largest square of 1's."
+    tests = [
+        {"input": "[['1','0','1','0','0'],['1','0','1','1','1'],['1','1','1','1','1'],['1','0','0','1','0']]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_count_complete_tree_nodes(rng, variant):
+    prompt = "Write a function count_nodes(root) that returns number of nodes in complete binary tree."
+    tests = [
+        {"input": "[1,2,3,4,5,6]", "output": "6"},
+        {"input": "[]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_serialize_and_deserialize_binary_tree(rng, variant):
+    prompt = "Write functions serialize and deserialize for a binary tree."
+    tests = [
+        {"input": "root=TreeNode(1); root.left=TreeNode(2); root.right=TreeNode(3); deserialize(serialize(root)).val", "output": "1"},
+        {"input": "deserialize(serialize(None))", "output": "None"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_serialize_and_deserialize_bst(rng, variant):
+    prompt = "Write functions serialize and deserialize for a BST."
+    tests = [
+        {"input": "root=TreeNode(2); root.left=TreeNode(1); root.right=TreeNode(3); deserialize(serialize(root)).val", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_flatten_binary_tree_to_linked_list(rng, variant):
+    prompt = "Write a function flatten(root) that flattens tree to linked list in‑place."
+    tests = [
+        {"input": "[1,2,5,3,4,None,6]", "output": "[1,None,2,None,3,None,4,None,5,None,6]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_populating_next_right_pointers(rng, variant):
+    prompt = "Write a function connect(root) that populates each next pointer to its right sibling."
+    tests = [
+        {"input": "[1,2,3,4,5,6,7]", "output": "[1,#,2,3,#,4,5,6,7,#]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_populating_next_right_pointers_ii(rng, variant):
+    prompt = "Write a function connect_ii(root) that works for any binary tree."
+    tests = [
+        {"input": "[1,2,3,4,5,None,7]", "output": "[1,#,2,3,#,4,5,7,#]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_lowest_common_ancestor(rng, variant):
+    prompt = "Write a function lowest_common_ancestor(root, p, q) that returns LCA in binary tree."
+    tests = [
+        {"input": "[3,5,1,6,2,0,8,None,None,7,4], 5, 1", "output": "3"},
+        {"input": "[3,5,1,6,2,0,8,None,None,7,4], 5, 4", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_lowest_common_ancestor_bst(rng, variant):
+    prompt = "Write a function lowest_common_ancestor_bst(root, p, q) that returns LCA in BST."
+    tests = [
+        {"input": "[6,2,8,0,4,7,9,None,None,3,5], 2, 8", "output": "6"},
+        {"input": "[6,2,8,0,4,7,9,None,None,3,5], 2, 4", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_maximum_path_sum(rng, variant):
+    prompt = "Write a function max_path_sum(root) that returns maximum path sum."
+    tests = [
+        {"input": "[1,2,3]", "output": "6"},
+        {"input": "[‑10,9,20,None,None,15,7]", "output": "42"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_diameter_of_binary_tree(rng, variant):
+    prompt = "Write a function diameter_of_binary_tree(root) that returns diameter length."
+    tests = [
+        {"input": "[1,2,3,4,5]", "output": "3"},
+        {"input": "[1,2]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_invert_binary_tree(rng, variant):
+    prompt = "Write a function invert_tree(root) that inverts the tree."
+    tests = [
+        {"input": "[4,2,7,1,3,6,9]", "output": "[4,7,2,9,6,3,1]"},
+        {"input": "[2,1,3]", "output": "[2,3,1]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_symmetric_tree(rng, variant):
+    prompt = "Write a function is_symmetric(root) that returns True if tree is symmetric."
+    tests = [
+        {"input": "[1,2,2,3,4,4,3]", "output": "True"},
+        {"input": "[1,2,2,None,3,None,3]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_same_tree(rng, variant):
+    prompt = "Write a function is_same_tree(p, q) that returns True if trees are identical."
+    tests = [
+        {"input": "[1,2,3], [1,2,3]", "output": "True"},
+        {"input": "[1,2], [1,None,2]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subtree_of_another_tree(rng, variant):
+    prompt = "Write a function is_subtree(root, sub_root) that returns True if subRoot is subtree."
+    tests = [
+        {"input": "[3,4,5,1,2], [4,1,2]", "output": "True"},
+        {"input": "[3,4,5,1,2,None,None,None,None,0], [4,1,2]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_construct_binary_tree_from_preorder_and_inorder(rng, variant):
+    prompt = "Write a function build_tree(preorder, inorder) that constructs binary tree."
+    tests = [
+        {"input": "[3,9,20,15,7], [9,3,15,20,7]", "output": "[3,9,20,None,None,15,7]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_construct_binary_tree_from_inorder_and_postorder(rng, variant):
+    prompt = "Write a function build_tree_in_post(inorder, postorder) that constructs binary tree."
+    tests = [
+        {"input": "[9,3,15,20,7], [9,15,7,20,3]", "output": "[3,9,20,None,None,15,7]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_construct_binary_tree_from_preorder_and_postorder(rng, variant):
+    prompt = "Write a function construct_from_pre_post(preorder, postorder) that constructs binary tree."
+    tests = [
+        {"input": "[1,2,4,5,3,6,7], [4,5,2,6,7,3,1]", "output": "[1,2,3,4,5,6,7]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_validate_binary_search_tree(rng, variant):
+    prompt = "Write a function is_valid_bst(root) that returns True if valid BST."
+    tests = [
+        {"input": "[2,1,3]", "output": "True"},
+        {"input": "[5,1,4,None,None,3,6]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_kth_smallest_element_in_bst(rng, variant):
+    prompt = "Write a function kth_smallest(root, k) that returns k‑th smallest element."
+    tests = [
+        {"input": "[3,1,4,None,2], 1", "output": "1"},
+        {"input": "[5,3,6,2,4,None,None,1], 3", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_convert_sorted_array_to_bst(rng, variant):
+    prompt = "Write a function sorted_array_to_bst(nums) that converts sorted array to height‑balanced BST."
+    tests = [
+        {"input": "[-10,-3,0,5,9]", "output": "[0,-3,9,-10,None,5]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_convert_sorted_list_to_bst(rng, variant):
+    prompt = "Write a function sorted_list_to_bst(head) that converts sorted linked list to height‑balanced BST."
+    tests = [
+        {"input": "[-10,-3,0,5,9]", "output": "[0,-3,9,-10,None,5]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_balanced_binary_tree(rng, variant):
+    prompt = "Write a function is_balanced(root) that returns True if tree is height‑balanced."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "True"},
+        {"input": "[1,2,2,3,3,None,None,4,4]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_depth_of_binary_tree(rng, variant):
+    prompt = "Write a function min_depth(root) that returns minimum depth."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "2"},
+        {"input": "[2,None,3,None,4,None,5,None,6]", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_depth_of_binary_tree(rng, variant):
+    prompt = "Write a function max_depth(root) that returns maximum depth."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "3"},
+        {"input": "[1,None,2]", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_paths(rng, variant):
+    prompt = "Write a function binary_tree_paths(root) that returns all root‑to‑leaf paths."
+    tests = [
+        {"input": "[1,2,3,None,5]", "output": "['1->2->5','1->3']"},
+        {"input": "[1]", "output": "['1']"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_sum_root_to_leaf_numbers(rng, variant):
+    prompt = "Write a function sum_numbers(root) that returns total sum of root‑to‑leaf numbers."
+    tests = [
+        {"input": "[1,2,3]", "output": "25"},
+        {"input": "[4,9,0,5,1]", "output": "1026"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_path_sum(rng, variant):
+    prompt = "Write a function has_path_sum(root, target_sum) that returns True if root‑to‑leaf sum equals target."
+    tests = [
+        {"input": "[5,4,8,11,None,13,4,7,2,None,None,None,1], 22", "output": "True"},
+        {"input": "[1,2,3], 5", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_path_sum_ii(rng, variant):
+    prompt = "Write a function path_sum(root, target_sum) that returns all root‑to‑leaf paths with sum."
+    tests = [
+        {"input": "[5,4,8,11,None,13,4,7,2,None,None,5,1], 22", "output": "[[5,4,11,2],[5,8,4,5]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_path_sum_iii(rng, variant):
+    prompt = "Write a function path_sum_iii(root, target_sum) that returns number of paths summing to target."
+    tests = [
+        {"input": "[10,5,-3,3,2,None,11,3,-2,None,1], 8", "output": "3"},
+        {"input": "[5,4,8,11,None,13,4,7,2,None,None,5,1], 22", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_right_side_view(rng, variant):
+    prompt = "Write a function right_side_view(root) that returns values of nodes seen from right side."
+    tests = [
+        {"input": "[1,2,3,None,5,None,4]", "output": "[1,3,4]"},
+        {"input": "[1,None,3]", "output": "[1,3]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_zigzag_level_order(rng, variant):
+    prompt = "Write a function zigzag_level_order(root) that returns zigzag level order traversal."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "[[3],[20,9],[15,7]]"},
+        {"input": "[1]", "output": "[[1]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_level_order_traversal(rng, variant):
+    prompt = "Write a function level_order(root) that returns level order traversal."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "[[3],[9,20],[15,7]]"},
+        {"input": "[1]", "output": "[[1]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_binary_tree_level_order_traversal_ii(rng, variant):
+    prompt = "Write a function level_order_bottom(root) that returns bottom‑up level order."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "[[15,7],[9,20],[3]]"},
+        {"input": "[1]", "output": "[[1]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_average_of_levels_in_binary_tree(rng, variant):
+    prompt = "Write a function average_of_levels(root) that returns average of each level."
+    tests = [
+        {"input": "[3,9,20,None,None,15,7]", "output": "[3.0,14.5,11.0]"},
+        {"input": "[3,9,20,15,7]", "output": "[3.0,14.5,11.0]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_find_largest_value_in_each_tree_row(rng, variant):
+    prompt = "Write a function largest_values(root) that returns largest value in each row."
+    tests = [
+        {"input": "[1,3,2,5,3,None,9]", "output": "[1,3,9]"},
+        {"input": "[1,2,3]", "output": "[1,3]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_find_bottom_left_tree_value(rng, variant):
+    prompt = "Write a function find_bottom_left_value(root) that returns leftmost value in bottom row."
+    tests = [
+        {"input": "[2,1,3]", "output": "1"},
+        {"input": "[1,2,3,4,None,5,6,None,None,7]", "output": "7"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_house_robber(rng, variant):
+    prompt = "Write a function rob(nums) that returns maximum money without robbing adjacent houses."
+    tests = [
+        {"input": "[1,2,3,1]", "output": "4"},
+        {"input": "[2,7,9,3,1]", "output": "12"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_house_robber_ii(rng, variant):
+    prompt = "Write a function rob_ii(nums) that works for circular houses."
+    tests = [
+        {"input": "[2,3,2]", "output": "3"},
+        {"input": "[1,2,3,1]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_house_robber_iii(rng, variant):
+    prompt = "Write a function rob_iii(root) that works for binary tree houses."
+    tests = [
+        {"input": "[3,2,3,None,3,None,1]", "output": "7"},
+        {"input": "[3,4,5,1,3,None,1]", "output": "9"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_paint_house(rng, variant):
+    prompt = "Write a function min_cost(costs) that returns minimum cost to paint houses with adjacent different colors."
+    tests = [
+        {"input": "[[17,2,17],[16,16,5],[14,3,19]]", "output": "10"},
+        {"input": "[[7,6,2]]", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_paint_house_ii(rng, variant):
+    prompt = "Write a function min_cost_ii(costs) that works for k colors."
+    tests = [
+        {"input": "[[1,5,3],[2,9,4]]", "output": "5"},
+        {"input": "[[1,3],[2,4]]", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_paint_fence(rng, variant):
+    prompt = "Write a function num_ways(n, k) that returns number of ways to paint fence with at most two adjacent same colors."
+    tests = [
+        {"input": "3, 2", "output": "6"},
+        {"input": "1, 1", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_cost_to_merge_stones(rng, variant):
+    prompt = "Write a function merge_stones(stones, k) that returns minimum cost to merge piles into one."
+    tests = [
+        {"input": "[3,2,4,1], 2", "output": "20"},
+        {"input": "[3,2,4,1], 3", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_burst_balloons_two(rng, variant):
+    prompt = "Write a function max_coins_two(nums) that returns maximum coins from bursting balloons."
+    tests = [
+        {"input": "[3,1,5,8]", "output": "167"},
+        {"input": "[1,5]", "output": "10"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_super_egg_drop_two(rng, variant):
+    prompt = "Write a function super_egg_drop_two(k, n) that returns minimum moves to determine critical floor."
+    tests = [
+        {"input": "1, 2", "output": "2"},
+        {"input": "2, 6", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_two(rng, variant):
+    prompt = "Write a function coin_change_two(coins, amount) that returns fewest coins to make amount."
+    tests = [
+        {"input": "[1,2,5], 11", "output": "3"},
+        {"input": "[2], 3", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_ii(rng, variant):
+    prompt = "Write a function change(amount, coins) that returns number of combinations to make amount."
+    tests = [
+        {"input": "5, [1,2,5]", "output": "4"},
+        {"input": "3, [2]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_combination_sum(rng, variant):
+    prompt = "Write a function combination_sum(candidates, target) that returns all combinations summing to target."
+    tests = [
+        {"input": "[2,3,6,7], 7", "output": "[[2,2,3],[7]]"},
+        {"input": "[2,3,5], 8", "output": "[[2,2,2,2],[2,3,3],[3,5]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_combination_sum_ii(rng, variant):
+    prompt = "Write a function combination_sum_ii(candidates, target) that returns unique combinations (each used once)."
+    tests = [
+        {"input": "[10,1,2,7,6,1,5], 8", "output": "[[1,1,6],[1,2,5],[1,7],[2,6]]"},
+        {"input": "[2,5,2,1,2], 5", "output": "[[1,2,2],[5]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_combination_sum_iii(rng, variant):
+    prompt = "Write a function combination_sum_iii(k, n) that returns all combinations of k numbers from 1‑9 summing to n."
+    tests = [
+        {"input": "3, 7", "output": "[[1,2,4]]"},
+        {"input": "3, 9", "output": "[[1,2,6],[1,3,5],[2,3,4]]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_combination_sum_iv(rng, variant):
+    prompt = "Write a function combination_sum_iv(nums, target) that returns number of possible combinations (order matters)."
+    tests = [
+        {"input": "[1,2,3], 4", "output": "7"},
+        {"input": "[9], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_partition_equal_subset_sum(rng, variant):
+    prompt = "Write a function can_partition(nums) that returns True if can partition into two equal sum subsets."
+    tests = [
+        {"input": "[1,5,11,5]", "output": "True"},
+        {"input": "[1,2,3,5]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_target_sum(rng, variant):
+    prompt = "Write a function find_target_sum_ways(nums, target) that returns number of ways to assign +/‑ to get target."
+    tests = [
+        {"input": "[1,1,1,1,1], 3", "output": "5"},
+        {"input": "[1], 1", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_last_stone_weight_ii(rng, variant):
+    prompt = "Write a function last_stone_weight_ii(stones) that returns minimum possible last stone weight."
+    tests = [
+        {"input": "[2,7,4,1,8,1]", "output": "1"},
+        {"input": "[31,26,33,21,40]", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_ones_and_zeroes(rng, variant):
+    prompt = "Write a function find_max_form(strs, m, n) that returns size of largest subset with at most m 0's and n 1's."
+    tests = [
+        {"input": "['10','0001','111001','1','0'], 5, 3", "output": "4"},
+        {"input": "['10','0','1'], 1, 1", "output": "2"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_iii(rng, variant):
+    prompt = "Write a function coin_change_iii(coins, amount) that returns fewest coins (each coin unlimited)."
+    tests = [
+        {"input": "[1,2,5], 11", "output": "3"},
+        {"input": "[2], 3", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_iv(rng, variant):
+    prompt = "Write a function coin_change_iv(coins, amount) that returns number of combinations (each coin unlimited)."
+    tests = [
+        {"input": "[1,2,5], 5", "output": "4"},
+        {"input": "[2], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_v(rng, variant):
+    prompt = "Write a function coin_change_v(coins, amount) that returns number of combinations (each coin used once)."
+    tests = [
+        {"input": "[1,2,5], 5", "output": "1"},
+        {"input": "[2], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_vi(rng, variant):
+    prompt = "Write a function coin_change_vi(coins, amount) that returns number of permutations (order matters)."
+    tests = [
+        {"input": "[1,2,5], 5", "output": "9"},
+        {"input": "[2], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_vii(rng, variant):
+    prompt = "Write a function coin_change_vii(coins, amount) that returns number of permutations (each coin unlimited)."
+    tests = [
+        {"input": "[1,2,5], 5", "output": "9"},
+        {"input": "[2], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_viii(rng, variant):
+    prompt = "Write a function coin_change_viii(coins, amount) that returns number of permutations (each coin used once)."
+    tests = [
+        {"input": "[1,2,5], 5", "output": "1"},
+        {"input": "[2], 3", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_ix(rng, variant):
+    prompt = "Write a function coin_change_ix(coins, amount) that returns number of combinations (limited coins)."
+    tests = [
+        {"input": "[1,2,5], 5, [2,3,1]", "output": "3"},
+        {"input": "[2], 3, [5]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_coin_change_x(rng, variant):
+    prompt = "Write a function coin_change_x(coins, amount) that returns number of permutations (limited coins)."
+    tests = [
+        {"input": "[1,2,5], 5, [2,3,1]", "output": "5"},
+        {"input": "[2], 3, [5]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_knapsack_two(rng, variant):
+    prompt = "Write a function knapsack_two(values, weights, capacity) that returns maximum value (0/1 knapsack)."
+    tests = [
+        {"input": "[60,100,120], [10,20,30], 50", "output": "220"},
+        {"input": "[1,2,3], [4,5,1], 4", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_knapsack_unbounded(rng, variant):
+    prompt = "Write a function knapsack_unbounded(values, weights, capacity) that returns maximum value (unbounded)."
+    tests = [
+        {"input": "[60,100,120], [10,20,30], 50", "output": "300"},
+        {"input": "[1,2,3], [4,5,1], 4", "output": "12"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_knapsack_bounded(rng, variant):
+    prompt = "Write a function knapsack_bounded(values, weights, counts, capacity) that returns maximum value (bounded)."
+    tests = [
+        {"input": "[60,100,120], [10,20,30], [2,3,1], 50", "output": "280"},
+        {"input": "[1,2,3], [4,5,1], [1,1,1], 4", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_two(rng, variant):
+    prompt = "Write a function subset_sum_two(nums, target) that returns True if any subset sums to target."
+    tests = [
+        {"input": "[3,34,4,12,5,2], 9", "output": "True"},
+        {"input": "[1,2,3], 7", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_count(rng, variant):
+    prompt = "Write a function subset_sum_count(nums, target) that returns number of subsets summing to target."
+    tests = [
+        {"input": "[1,1,2,3], 4", "output": "3"},
+        {"input": "[1,2,3], 5", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_min_diff(rng, variant):
+    prompt = "Write a function subset_sum_min_diff(nums) that returns minimum subset sum difference."
+    tests = [
+        {"input": "[1,6,11,5]", "output": "1"},
+        {"input": "[1,2,7]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_partition(rng, variant):
+    prompt = "Write a function can_partition_two(nums) that returns True if can partition into two equal sum subsets."
+    tests = [
+        {"input": "[1,5,11,5]", "output": "True"},
+        {"input": "[1,2,3,5]", "output": "False"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_partition_count(rng, variant):
+    prompt = "Write a function partition_count(nums) that returns number of ways to partition into two equal sum subsets."
+    tests = [
+        {"input": "[1,1,2,3]", "output": "1"},
+        {"input": "[1,2,3,4,5,6,7]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_subset_sum_partition_min_diff(rng, variant):
+    prompt = "Write a function partition_min_diff(nums) that returns minimum difference between subset sums."
+    tests = [
+        {"input": "[1,6,11,5]", "output": "1"},
+        {"input": "[1,2,7]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_increasing_subsequence(rng, variant):
+    prompt = "Write a function length_of_lis(nums) that returns length of longest increasing subsequence."
+    tests = [
+        {"input": "[10,9,2,5,3,7,101,18]", "output": "4"},
+        {"input": "[0,1,0,3,2,3]", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_longest_increasing_subsequence_count(rng, variant):
+    prompt = "Write a function find_number_of_lis(nums) that returns number of longest increasing subsequences."
+    tests = [
+        {"input": "[1,3,5,4,7]", "output": "2"},
+        {"input": "[2,2,2,2,2]", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_russian_doll_envelopes(rng, variant):
+    prompt = "Write a function max_envelopes(envelopes) that returns maximum Russian doll envelopes."
+    tests = [
+        {"input": "[[5,4],[6,4],[6,7],[2,3]]", "output": "3"},
+        {"input": "[[1,1],[1,1],[1,1]]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_length_of_pair_chain(rng, variant):
+    prompt = "Write a function find_longest_chain(pairs) that returns longest chain of pairs (a,b) where a<b."
+    tests = [
+        {"input": "[[1,2],[2,3],[3,4]]", "output": "2"},
+        {"input": "[[1,2],[7,8],[4,5]]", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_sum_of_3_non_overlapping_subarrays(rng, variant):
+    prompt = "Write a function max_sum_of_three_subarrays(nums, k) that returns starting indices of three non‑overlapping subarrays with maximum sum."
+    tests = [
+        {"input": "[1,2,1,2,6,7,5,1], 2", "output": "[0,3,5]"},
+        {"input": "[1,2,1,2,1,2,1,2,1], 2", "output": "[0,2,4]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_product_subarray(rng, variant):
+    prompt = "Write a function max_product(nums) that returns maximum product subarray."
+    tests = [
+        {"input": "[2,3,-2,4]", "output": "6"},
+        {"input": "[-2,0,-1]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_subarray(rng, variant):
+    prompt = "Write a function max_sub_array(nums) that returns maximum sum subarray."
+    tests = [
+        {"input": "[-2,1,-3,4,-1,2,1,-5,4]", "output": "6"},
+        {"input": "[1]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_subarray_sum_with_one_deletion(rng, variant):
+    prompt = "Write a function maximum_sum(arr) that returns maximum sum subarray with at most one deletion."
+    tests = [
+        {"input": "[1,-2,0,3]", "output": "4"},
+        {"input": "[1,-2,-2,3]", "output": "3"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_absolute_sum_of_any_subarray(rng, variant):
+    prompt = "Write a function max_abs_sum(nums) that returns maximum absolute sum of any subarray."
+    tests = [
+        {"input": "[1,-3,2,3,-4]", "output": "5"},
+        {"input": "[2,-5,1,-4,3,-2]", "output": "8"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_sum_circular_subarray(rng, variant):
+    prompt = "Write a function max_subarray_sum_circular(nums) that returns maximum sum circular subarray."
+    tests = [
+        {"input": "[1,-2,3,-2]", "output": "3"},
+        {"input": "[5,-3,5]", "output": "10"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_sum_of_two_non_overlapping_subarrays(rng, variant):
+    prompt = "Write a function max_sum_two_no_overlap(nums, first_len, second_len) that returns maximum sum of two non‑overlapping subarrays."
+    tests = [
+        {"input": "[0,6,5,2,2,5,1,9,4], 1, 2", "output": "20"},
+        {"input": "[3,8,1,3,2,1,8,9,0], 3, 2", "output": "29"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_sum_of_three_non_overlapping_subarrays_two(rng, variant):
+    prompt = "Write a function max_sum_three_non_overlap(nums, k) that returns maximum sum of three non‑overlapping subarrays."
+    tests = [
+        {"input": "[1,2,1,2,6,7,5,1], 2", "output": "[0,3,5]"},
+        {"input": "[1,2,1,2,1,2,1,2,1], 2", "output": "[0,2,4]"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_maximum_points_you_can_obtain_from_cards(rng, variant):
+    prompt = "Write a function max_score(card_points, k) that returns maximum score by taking k cards from ends."
+    tests = [
+        {"input": "[1,2,3,4,5,6,1], 3", "output": "12"},
+        {"input": "[2,2,2], 2", "output": "4"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_swaps_to_group_all_1s_together(rng, variant):
+    prompt = "Write a function min_swaps(data) that returns minimum swaps to group all 1's together."
+    tests = [
+        {"input": "[1,0,1,0,1]", "output": "1"},
+        {"input": "[0,0,0,1,0]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_swaps_to_make_sequences_increasing(rng, variant):
+    prompt = "Write a function min_swap(nums1, nums2) that returns minimum swaps to make both arrays strictly increasing."
+    tests = [
+        {"input": "[1,3,5,4], [1,2,3,7]", "output": "1"},
+        {"input": "[0,3,5,8,9], [2,1,4,6,9]", "output": "1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_domino_rotations_for_equal_row(rng, variant):
+    prompt = "Write a function min_domino_rotations(tops, bottoms) that returns minimum rotations to make all values in tops or bottoms equal."
+    tests = [
+        {"input": "[2,1,2,4,2,2], [5,2,6,2,3,2]", "output": "2"},
+        {"input": "[3,5,1,2,3], [3,6,3,3,4]", "output": "‑1"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements(rng, variant):
+    prompt = "Write a function min_moves(nums) that returns minimum increments to make all elements equal."
+    tests = [
+        {"input": "[1,2,3]", "output": "3"},
+        {"input": "[1,1,1]", "output": "0"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_ii(rng, variant):
+    prompt = "Write a function min_moves2(nums) that returns minimum increments/decrements to make all elements equal."
+    tests = [
+        {"input": "[1,2,3]", "output": "2"},
+        {"input": "[1,10,2,9]", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_iii(rng, variant):
+    prompt = "Write a function min_moves3(nums, k) that returns minimum increments to make all elements equal with at most k operations."
+    tests = [
+        {"input": "[1,2,3], 3", "output": "2"},
+        {"input": "[1,10,2,9], 100", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_iv(rng, variant):
+    prompt = "Write a function min_moves4(nums, limit) that returns minimum increments/decrements with limit per operation."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_v(rng, variant):
+    prompt = "Write a function min_moves5(nums, k) that returns minimum increments to make all elements equal with at most k total change."
+    tests = [
+        {"input": "[1,2,3], 3", "output": "2"},
+        {"input": "[1,10,2,9], 100", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_vi(rng, variant):
+    prompt = "Write a function min_moves6(nums, limit) that returns minimum increments/decrements with limit per element."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_vii(rng, variant):
+    prompt = "Write a function min_moves7(nums, k) that returns minimum increments to make all elements equal with at most k operations per element."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_viii(rng, variant):
+    prompt = "Write a function min_moves8(nums, limit) that returns minimum increments/decrements with limit per operation and per element."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_ix(rng, variant):
+    prompt = "Write a function min_moves9(nums, k) that returns minimum increments to make all elements equal with at most k total change and per element limit."
+    tests = [
+        {"input": "[1,2,3], 3", "output": "2"},
+        {"input": "[1,10,2,9], 100", "output": "16"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_x(rng, variant):
+    prompt = "Write a function min_moves10(nums, limit) that returns minimum increments/decrements with limit per operation and total limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xi(rng, variant):
+    prompt = "Write a function min_moves11(nums, k) that returns minimum increments to make all elements equal with at most k operations and per element limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xii(rng, variant):
+    prompt = "Write a function min_moves12(nums, limit) that returns minimum increments/decrements with limit per operation, per element, and total limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xiii(rng, variant):
+    prompt = "Write a function min_moves13(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, and total limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xiv(rng, variant):
+    prompt = "Write a function min_moves14(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, and per operation type limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xv(rng, variant):
+    prompt = "Write a function min_moves15(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, and per operation type limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xvi(rng, variant):
+    prompt = "Write a function min_moves16(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, and per element type limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xvii(rng, variant):
+    prompt = "Write a function min_moves17(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, and per element type limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xviii(rng, variant):
+    prompt = "Write a function min_moves18(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, and per operation group limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xix(rng, variant):
+    prompt = "Write a function min_moves19(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, and per operation group limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xx(rng, variant):
+    prompt = "Write a function min_moves20(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, and per element group limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxi(rng, variant):
+    prompt = "Write a function min_moves21(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, and per element group limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxii(rng, variant):
+    prompt = "Write a function min_moves22(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, and per operation subgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxiii(rng, variant):
+    prompt = "Write a function min_moves23(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, and per operation subgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxiv(rng, variant):
+    prompt = "Write a function min_moves24(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, and per element subgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxv(rng, variant):
+    prompt = "Write a function min_moves25(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, and per element subgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxvi(rng, variant):
+    prompt = "Write a function min_moves26(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, and per operation category limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxvii(rng, variant):
+    prompt = "Write a function min_moves27(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, and per operation category limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxviii(rng, variant):
+    prompt = "Write a function min_moves28(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, and per element category limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxix(rng, variant):
+    prompt = "Write a function min_moves29(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, and per element category limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxx(rng, variant):
+    prompt = "Write a function min_moves30(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, and per operation family limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxi(rng, variant):
+    prompt = "Write a function min_moves31(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, and per operation family limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxii(rng, variant):
+    prompt = "Write a function min_moves32(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, and per element family limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxiii(rng, variant):
+    prompt = "Write a function min_moves33(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, and per element family limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxiv(rng, variant):
+    prompt = "Write a function min_moves34(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, and per operation supergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxv(rng, variant):
+    prompt = "Write a function min_moves35(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, and per operation supergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxvi(rng, variant):
+    prompt = "Write a function min_moves36(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, and per element supergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxvii(rng, variant):
+    prompt = "Write a function min_moves37(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, and per element supergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxviii(rng, variant):
+    prompt = "Write a function min_moves38(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, and per operation megagroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xxxix(rng, variant):
+    prompt = "Write a function min_moves39(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, and per operation megagroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xl(rng, variant):
+    prompt = "Write a function min_moves40(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, and per element megagroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xli(rng, variant):
+    prompt = "Write a function min_moves41(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, and per element megagroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlii(rng, variant):
+    prompt = "Write a function min_moves42(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, and per operation ultragroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xliii(rng, variant):
+    prompt = "Write a function min_moves43(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, and per operation ultragroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xliv(rng, variant):
+    prompt = "Write a function min_moves44(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, and per element ultragroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlv(rng, variant):
+    prompt = "Write a function min_moves45(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, and per element ultragroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlvi(rng, variant):
+    prompt = "Write a function min_moves46(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, and per operation hypergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlvii(rng, variant):
+    prompt = "Write a function min_moves47(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, and per operation hypergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlviii(rng, variant):
+    prompt = "Write a function min_moves48(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, and per element hypergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_xlix(rng, variant):
+    prompt = "Write a function min_moves49(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, and per element hypergroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_l(rng, variant):
+    prompt = "Write a function min_moves50(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, and per operation omnigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_li(rng, variant):
+    prompt = "Write a function min_moves51(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, and per operation omnigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lii(rng, variant):
+    prompt = "Write a function min_moves52(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, and per element omnigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_liii(rng, variant):
+    prompt = "Write a function min_moves53(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, and per element omnigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_liv(rng, variant):
+    prompt = "Write a function min_moves54(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, and per operation maxigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lv(rng, variant):
+    prompt = "Write a function min_moves55(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, and per operation maxigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lvi(rng, variant):
+    prompt = "Write a function min_moves56(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, and per element maxigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lvii(rng, variant):
+    prompt = "Write a function min_moves57(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, and per element maxigroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lviii(rng, variant):
+    prompt = "Write a function min_moves58(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, and per operation ultimategroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lix(rng, variant):
+    prompt = "Write a function min_moves59(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, and per operation ultimategroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lx(rng, variant):
+    prompt = "Write a function min_moves60(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, and per element ultimategroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxi(rng, variant):
+    prompt = "Write a function min_moves61(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, and per element ultimategroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxii(rng, variant):
+    prompt = "Write a function min_moves62(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, and per operation finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxiii(rng, variant):
+    prompt = "Write a function min_moves63(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, and per operation finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxiv(rng, variant):
+    prompt = "Write a function min_moves64(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, and per element finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxv(rng, variant):
+    prompt = "Write a function min_moves65(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, and per element finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxvi(rng, variant):
+    prompt = "Write a function min_moves66(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, and per operation endgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxvii(rng, variant):
+    prompt = "Write a function min_moves67(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, and per operation endgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxviii(rng, variant):
+    prompt = "Write a function min_moves68(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, and per element endgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxix(rng, variant):
+    prompt = "Write a function min_moves69(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, and per element endgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxx(rng, variant):
+    prompt = "Write a function min_moves70(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, and per operation lastgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxi(rng, variant):
+    prompt = "Write a function min_moves71(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, and per operation lastgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxii(rng, variant):
+    prompt = "Write a function min_moves72(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, and per element lastgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxiii(rng, variant):
+    prompt = "Write a function min_moves73(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, and per element lastgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxiv(rng, variant):
+    prompt = "Write a function min_moves74(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, and per operation ultimatefinalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxv(rng, variant):
+    prompt = "Write a function min_moves75(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, and per operation ultimatefinalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxvi(rng, variant):
+    prompt = "Write a function min_moves76(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, and per element ultimatefinalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxvii(rng, variant):
+    prompt = "Write a function min_moves77(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, and per element ultimatefinalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxviii(rng, variant):
+    prompt = "Write a function min_moves78(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, per element ultimatefinalgroup limit, and per operation absolute finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxix(rng, variant):
+    prompt = "Write a function min_moves79(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, per element ultimatefinalgroup limit, and per operation absolute finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxx(rng, variant):
+    prompt = "Write a function min_moves80(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, per element ultimatefinalgroup limit, per operation absolute finalgroup limit, and per element absolute finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxxi(rng, variant):
+    prompt = "Write a function min_moves81(nums, k) that returns minimum increments to make all elements equal with at most k operations, per element limit, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit, per element omnigroup limit, per operation maxigroup limit, per element maxigroup limit, per operation ultimategroup limit, per element ultimategroup limit, per operation finalgroup limit, per element finalgroup limit, per operation endgroup limit, per element endgroup limit, per operation lastgroup limit, per element lastgroup limit, per operation ultimatefinalgroup limit, per element ultimatefinalgroup limit, per operation absolute finalgroup limit, and per element absolute finalgroup limit."
+    tests = [
+        {"input": "[1,2,3], 1", "output": "2"},
+        {"input": "[1,10,2,9], 5", "output": "5"}
+    ]
+    return prompt, tests
+
+def generate_code_gen_minimum_moves_to_equal_array_elements_lxxxii(rng, variant):
+    prompt = "Write a function min_moves82(nums, limit) that returns minimum increments/decrements with limit per operation, per element, total limit, per operation type limit, per element type limit, per operation group limit, per element group limit, per operation subgroup limit, per element subgroup limit, per operation category limit, per element category limit, per operation family limit, per element family limit, per operation supergroup limit, per element supergroup limit, per operation megagroup limit, per element megagroup limit, per operation ultragroup limit, per element ultragroup limit, per operation hypergroup limit, per element hypergroup limit, per operation omnigroup limit,
+
+[WISH_DONE ok=True cost=0.0191 in=2047 out=44202]
+wish exit: 0

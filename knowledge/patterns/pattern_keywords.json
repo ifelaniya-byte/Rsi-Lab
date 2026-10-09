@@ -1,0 +1,260 @@
+{
+ "optimization": [
+  "optim",
+  "minim",
+  "maxim",
+  "gradient descent",
+  "least squares",
+  "efficient",
+  "best fit"
+ ],
+ "symmetry": [
+  "symmetr",
+  "invariant",
+  "conservation",
+  "noether"
+ ],
+ "waves": [
+  "wave",
+  "oscillat",
+  "frequency",
+  "resonan",
+  "fourier",
+  "harmonic",
+  "vibrat",
+  "interfer"
+ ],
+ "recursion": [
+  "recursi",
+  "induction",
+  "fractal",
+  "self-similar",
+  "divide and conquer",
+  "dynamic programming"
+ ],
+ "entropy": [
+  "entrop",
+  "disorder",
+  "information",
+  "uncertainty",
+  "second law"
+ ],
+ "networks": [
+  "network",
+  "graph",
+  "node",
+  "edge",
+  "connectivity",
+  "topology"
+ ],
+ "conservation": [
+  "conserv",
+  "invariant",
+  "continuity equation"
+ ],
+ "feedback": [
+  "feedback",
+  "control",
+  "stability",
+  "equilibrium",
+  "homeostasis",
+  "pid"
+ ],
+ "scaling": [
+  "scaling",
+  "power law",
+  "dimensional",
+  "fractal dimension",
+  "renormal"
+ ],
+ "randomness": [
+  "random",
+  "stochastic",
+  "probability",
+  "monte carlo",
+  "noise",
+  "markov"
+ ],
+ "approximation": [
+  "approximat",
+  "taylor",
+  "perturbation",
+  "numerical",
+  "asymptotic",
+  "interpolat"
+ ],
+ "transformation": [
+  "transform",
+  "mapping",
+  "isomorphism",
+  "fourier",
+  "laplace",
+  "change of basis",
+  "convert"
+ ],
+ "hierarchy": [
+  "hierarch",
+  "layer",
+  "abstraction",
+  "encapsulat",
+  "modular"
+ ],
+ "flow": [
+  "flow",
+  "flux",
+  "current",
+  "diffusion",
+  "transport",
+  "gradient",
+  "spread",
+  "drift",
+  "movement",
+  "propagat",
+  "circulat"
+ ],
+ "duality": [
+  "dual",
+  "complement",
+  "primal",
+  "wave-particle"
+ ],
+ "threshold": [
+  "threshold",
+  "phase transition",
+  "critical",
+  "tipping",
+  "bifurcation"
+ ],
+ "emergence": [
+  "emergen",
+  "collective",
+  "self-organiz",
+  "complex system"
+ ],
+ "periodicity": [
+  "periodic",
+  "cycle",
+  "orbit",
+  "seasonal",
+  "rhythm"
+ ],
+ "extremum": [
+  "extrem",
+  "saddle",
+  "lagrange",
+  "variational"
+ ],
+ "linearity": [
+  "linear",
+  "superposition",
+  "matrix",
+  "vector space"
+ ],
+ "composition": [
+  "building block",
+  "composed of",
+  "arrangement",
+  "combin",
+  "made of",
+  "fundamental unit",
+  "elementary"
+ ],
+ "energy-conversion": [
+  "energy",
+  "atp",
+  "photosynthesis",
+  "metabolism",
+  "power",
+  "electricity"
+ ],
+ "geometry": [
+  "curv",
+  "geodes",
+  "geometry",
+  "metric",
+  "manifold",
+  "triangle",
+  "angle"
+ ],
+ "discreteness": [
+  "discrete",
+  "packet",
+  "quantiz",
+  "integer",
+  "counting",
+  "digital"
+ ],
+ "measurement": [
+  "measur",
+  "sensor",
+  "detect",
+  "observ",
+  "probe",
+  "instrument"
+ ],
+ "coupling": [
+  "coupl",
+  "interact",
+  "bind",
+  "link"
+ ],
+ "inverse": [
+  "inverse",
+  "reverse",
+  "reciprocal"
+ ],
+ "standardization": [
+  "standard",
+  "identical",
+  "interchangeable",
+  "uniform",
+  "congruen"
+ ],
+ "amplification": [
+  "amplif",
+  "exponential",
+  "gain"
+ ],
+ "separation": [
+  "separat",
+  "purif",
+  "distill",
+  "extract",
+  "filter",
+  "isolate"
+ ],
+ "encoding": [
+  "encod",
+  "dna",
+  "genetic",
+  "qubit",
+  "information carrier"
+ ],
+ "balance": [
+  "balanc"
+ ],
+ "decomposition": [
+  "decompos",
+  "break down",
+  "breakdown",
+  "digest",
+  "decay"
+ ],
+ "unification": [
+  "unif",
+  "grand unified",
+  "theory of everything"
+ ],
+ "hidden": [
+  "invisible",
+  "hidden",
+  "dark matter",
+  "latent",
+  "unseen"
+ ],
+ "extension": [
+  "extend",
+  "continuation",
+  "generaliz"
+ ]
+}

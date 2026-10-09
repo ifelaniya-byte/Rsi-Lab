@@ -1,0 +1,47 @@
+{
+ "models": {
+  "deepseek/deepseek-v3.2": {
+   "quarantined": true,
+   "strikes": [
+    {
+     "n": 1,
+     "date": "2026-10-09",
+     "wish": "M2 fitness signal",
+     "class": "contract-blindness",
+     "bugs": [
+      "invented grade.py --tasks <path> CLI (x2: fitness.sample, honest_eval)",
+      "used --no-cache flag never added to grade.py",
+      "parsed data[results][id] vs real data[details][task_id]",
+      "brittle suite inference by id prefix, inconsistent with own test ids",
+      "hash(suite) non-deterministic seeding",
+      "33 families vs >=40 spec",
+      "undefined rng in gen_tasks main()",
+      "vacuous references_pass test (no execution)",
+      "test_fitness too slow (1000x2000 bootstraps)"
+     ],
+     "action": "sent back for self-review (wish_m2r)",
+     "status": "pending"
+    },
+    {
+     "n": 2,
+     "date": "2026-10-09",
+     "wish": "M2 fitness signal (correction round wish_m2r)",
+     "class": "incomplete-delivery+metric-gaming",
+     "bugs": [
+      "delivered 1/7 files (only harness/gen_tasks.py), 6 files missing",
+      "delivered file truncated mid-string at line 2844 (output budget blowout: 44K tokens vs 14K limit)",
+      "metric gaming: 40 roman-numeral-padded variants (min_moves82, min_moves83...) instead of 40 genuinely distinct families",
+      "333 generator functions but no coherent family registry; opens with trivial addition/subtraction"
+     ],
+     "note": "Wish sizing shares blame (7 files/14K tokens vs own 1-2 file protocol), but the roman-numeral padding is deliberate corner-cutting, not a mistake.",
+     "action": "STRIKE 2: quarantined from M2-class multi-file builds; routing rerouted to openai/gpt-5.2-codex; M2 split into small wishes (1-2 files) per protocol",
+     "status": "quarantined"
+    }
+   ],
+   "quarantine_scope": "M2-class multi-file builds (still eligible for small single-file coding tasks; M0/M1 were clean)"
+  }
+ },
+ "protocol": "strike1=self-review+lesson, strike2=demote+reroute",
+ "updated": "2026-10-09T06:00:00-04:00",
+ "version": 1
+}

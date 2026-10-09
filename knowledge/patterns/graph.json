@@ -1,0 +1,4064 @@
+{
+ "patterns": {
+  "feedback": {
+   "BIO-01-004": [
+    "pid"
+   ],
+   "BIO-01-005": [
+    "control"
+   ],
+   "BIO-01-009": [
+    "pid"
+   ],
+   "BIO-04-006": [
+    "pid"
+   ],
+   "BIO-06-008": [
+    "control"
+   ],
+   "BIO-07-010": [
+    "control"
+   ],
+   "BIO-07-012": [
+    "homeostasis"
+   ],
+   "BIO-08-007": [
+    "control"
+   ],
+   "BIO-08-011": [
+    "control"
+   ],
+   "CHEM-01-003": [
+    "stability"
+   ],
+   "CHEM-03-008": [
+    "stability"
+   ],
+   "CHEM-03-010": [
+    "stability"
+   ],
+   "CHEM-06-010": [
+    "equilibrium"
+   ],
+   "CHEM-07-006": [
+    "equilibrium"
+   ],
+   "CHEM-09-004": [
+    "stability"
+   ],
+   "CHEM-11-007": [
+    "control"
+   ],
+   "CODE-01-002": [
+    "control"
+   ],
+   "CODE-04-012": [
+    "control"
+   ],
+   "CODE-05-001": [
+    "control"
+   ],
+   "CODE-05-002": [
+    "pid"
+   ],
+   "CODE-05-010": [
+    "feedback"
+   ],
+   "CODE-06-005": [
+    "control"
+   ],
+   "CODE-07-008": [
+    "control"
+   ],
+   "CODE-08-003": [
+    "control"
+   ],
+   "CODE-08-011": [
+    "control"
+   ],
+   "CODE-10-012": [
+    "pid"
+   ],
+   "CODE-11-007": [
+    "control"
+   ],
+   "EARTH-04-009": [
+    "control"
+   ],
+   "EARTH-06-004": [
+    "control"
+   ],
+   "EARTH-07-001": [
+    "control"
+   ],
+   "ENG-02-009": [
+    "pid"
+   ],
+   "ENG-05-005": [
+    "control"
+   ],
+   "ENG-07-003": [
+    "control"
+   ],
+   "MATH-03-011": [
+    "stability"
+   ],
+   "MATH-12-008": [
+    "control"
+   ],
+   "MATH-14-013": [
+    "stability"
+   ],
+   "MATH-15-004": [
+    "equilibrium"
+   ],
+   "MATH-15-013": [
+    "stability"
+   ],
+   "MATH-15-015": [
+    "stability"
+   ],
+   "PHYS-02-001": [
+    "equilibrium"
+   ],
+   "PHYS-02-010": [
+    "equilibrium"
+   ],
+   "PHYS-04-008": [
+    "feedback"
+   ],
+   "PHYS-08-003": [
+    "equilibrium"
+   ],
+   "PHYS-08-010": [
+    "equilibrium"
+   ],
+   "PHYS-10-002": [
+    "stability"
+   ],
+   "PHYS-12-002": [
+    "stability"
+   ],
+   "PHYS-12-003": [
+    "stability"
+   ],
+   "PHYS-14-001": [
+    "equilibrium"
+   ],
+   "PHYS-14-009": [
+    "stability"
+   ],
+   "PHYS-15-007": [
+    "pid"
+   ],
+   "PHYS-15-008": [
+    "stability"
+   ],
+   "PHYS-17-002": [
+    "equilibrium"
+   ],
+   "PHYS-17-004": [
+    "stability"
+   ],
+   "PHYS-18-001": [
+    "stability"
+   ],
+   "PHYS-18-010": [
+    "feedback",
+    "control",
+    "stability"
+   ],
+   "PHYS-02-011": [
+    "equilibrium"
+   ],
+   "PHYS-02-020": [
+    "equilibrium"
+   ],
+   "PHYS-04-018": [
+    "feedback"
+   ]
+  },
+  "flow": {
+   "BIO-01-004": [
+    "transport"
+   ],
+   "BIO-01-006": [
+    "flow"
+   ],
+   "BIO-01-011": [
+    "transport",
+    "gradient"
+   ],
+   "BIO-03-004": [
+    "drift"
+   ],
+   "BIO-05-010": [
+    "spread"
+   ],
+   "BIO-06-001": [
+    "flow"
+   ],
+   "BIO-06-002": [
+    "movement"
+   ],
+   "BIO-07-002": [
+    "movement"
+   ],
+   "BIO-07-003": [
+    "circulat"
+   ],
+   "BIO-09-002": [
+    "flow"
+   ],
+   "BIO-09-007": [
+    "flow"
+   ],
+   "CHEM-05-002": [
+    "drift"
+   ],
+   "CHEM-05-005": [
+    "flow"
+   ],
+   "CHEM-08-001": [
+    "flow"
+   ],
+   "CODE-01-002": [
+    "flow"
+   ],
+   "CODE-01-008": [
+    "flow"
+   ],
+   "CODE-01-009": [
+    "flow",
+    "propagat"
+   ],
+   "CODE-03-002": [
+    "flow"
+   ],
+   "CODE-03-012": [
+    "current"
+   ],
+   "CODE-06-005": [
+    "current"
+   ],
+   "CODE-07-005": [
+    "transport"
+   ],
+   "CODE-08-003": [
+    "current"
+   ],
+   "CODE-09-006": [
+    "diffusion"
+   ],
+   "CODE-10-009": [
+    "spread"
+   ],
+   "CODE-12-012": [
+    "gradient"
+   ],
+   "EARTH-01-002": [
+    "drift"
+   ],
+   "EARTH-05-005": [
+    "circulat"
+   ],
+   "EARTH-07-003": [
+    "flow"
+   ],
+   "EARTH-07-006": [
+    "transport"
+   ],
+   "ENG-01-005": [
+    "spread"
+   ],
+   "ENG-03-008": [
+    "flow"
+   ],
+   "ENG-04-001": [
+    "current"
+   ],
+   "ENG-04-002": [
+    "flow"
+   ],
+   "ENG-04-008": [
+    "current"
+   ],
+   "ENG-05-001": [
+    "current"
+   ],
+   "ENG-05-002": [
+    "current"
+   ],
+   "ENG-06-005": [
+    "flow"
+   ],
+   "ENG-07-007": [
+    "flow"
+   ],
+   "ENG-08-005": [
+    "current"
+   ],
+   "MATH-11-003": [
+    "gradient"
+   ],
+   "MATH-11-006": [
+    "propagat"
+   ],
+   "MATH-11-009": [
+    "circulat"
+   ],
+   "MATH-11-010": [
+    "flux"
+   ],
+   "MATH-11-011": [
+    "circulat"
+   ],
+   "MATH-11-013": [
+    "flux"
+   ],
+   "MATH-11-014": [
+    "gradient"
+   ],
+   "MATH-11-015": [
+    "gradient"
+   ],
+   "MATH-15-002": [
+    "diffusion",
+    "spread"
+   ],
+   "MATH-15-008": [
+    "transport"
+   ],
+   "PHYS-02-010": [
+    "flux",
+    "transport"
+   ],
+   "PHYS-03-002": [
+    "flux"
+   ],
+   "PHYS-03-004": [
+    "current"
+   ],
+   "PHYS-03-005": [
+    "current"
+   ],
+   "PHYS-03-006": [
+    "flux"
+   ],
+   "PHYS-03-007": [
+    "propagat"
+   ],
+   "PHYS-03-008": [
+    "flux"
+   ],
+   "PHYS-03-009": [
+    "propagat"
+   ],
+   "PHYS-04-001": [
+    "propagat"
+   ],
+   "PHYS-06-010": [
+    "flux"
+   ],
+   "PHYS-08-007": [
+    "flow"
+   ],
+   "PHYS-08-010": [
+    "diffusion"
+   ],
+   "PHYS-09-001": [
+    "flow"
+   ],
+   "PHYS-09-002": [
+    "flow"
+   ],
+   "PHYS-09-004": [
+    "flow"
+   ],
+   "PHYS-09-006": [
+    "flow"
+   ],
+   "PHYS-09-007": [
+    "flow"
+   ],
+   "PHYS-09-008": [
+    "flow"
+   ],
+   "PHYS-09-009": [
+    "flow"
+   ],
+   "PHYS-09-010": [
+    "flow"
+   ],
+   "PHYS-10-002": [
+    "propagat"
+   ],
+   "PHYS-10-008": [
+    "diffusion",
+    "transport"
+   ],
+   "PHYS-11-004": [
+    "transport"
+   ],
+   "PHYS-11-008": [
+    "transport"
+   ],
+   "PHYS-12-009": [
+    "flux"
+   ],
+   "PHYS-14-001": [
+    "gradient"
+   ],
+   "PHYS-14-002": [
+    "flux"
+   ],
+   "PHYS-14-007": [
+    "flow"
+   ],
+   "PHYS-16-001": [
+    "gradient"
+   ],
+   "PHYS-17-007": [
+    "flow"
+   ],
+   "PHYS-18-003": [
+    "current",
+    "transport"
+   ],
+   "PHYS-18-005": [
+    "propagat"
+   ],
+   "PHYS-18-008": [
+    "flux",
+    "diffusion",
+    "transport",
+    "spread"
+   ],
+   "PHYS-18-009": [
+    "transport"
+   ],
+   "PHYS-02-020": [
+    "flux",
+    "transport"
+   ],
+   "PHYS-03-012": [
+    "flux"
+   ],
+   "PHYS-03-014": [
+    "current"
+   ],
+   "PHYS-03-015": [
+    "current"
+   ],
+   "PHYS-03-016": [
+    "flux"
+   ],
+   "PHYS-03-017": [
+    "propagat"
+   ],
+   "PHYS-03-018": [
+    "flux"
+   ],
+   "PHYS-03-019": [
+    "propagat"
+   ],
+   "PHYS-04-011": [
+    "propagat"
+   ],
+   "QUANT-07-003": [
+    "current"
+   ],
+   "QUANT-07-004": [
+    "current"
+   ]
+  },
+  "encoding": {
+   "BIO-01-005": [
+    "dna"
+   ],
+   "BIO-01-013": [
+    "dna"
+   ],
+   "BIO-02-001": [
+    "dna"
+   ],
+   "BIO-02-002": [
+    "encod",
+    "dna"
+   ],
+   "BIO-02-003": [
+    "dna"
+   ],
+   "BIO-02-004": [
+    "dna"
+   ],
+   "BIO-02-005": [
+    "dna"
+   ],
+   "BIO-02-007": [
+    "genetic"
+   ],
+   "BIO-02-008": [
+    "dna"
+   ],
+   "BIO-02-013": [
+    "dna"
+   ],
+   "BIO-02-014": [
+    "dna"
+   ],
+   "BIO-03-004": [
+    "genetic"
+   ],
+   "BIO-04-007": [
+    "dna"
+   ],
+   "BIO-10-006": [
+    "encod"
+   ],
+   "CHEM-03-004": [
+    "dna"
+   ],
+   "CODE-12-001": [
+    "qubit"
+   ],
+   "CODE-12-006": [
+    "dna"
+   ],
+   "ENG-09-003": [
+    "encod"
+   ],
+   "MATH-03-009": [
+    "encod"
+   ],
+   "MATH-07-008": [
+    "encod"
+   ],
+   "MATH-16-012": [
+    "encod"
+   ],
+   "PHYS-18-004": [
+    "dna"
+   ],
+   "QUANT-01-002": [
+    "qubit"
+   ],
+   "QUANT-02-005": [
+    "qubit"
+   ],
+   "QUANT-03-001": [
+    "qubit"
+   ],
+   "QUANT-03-002": [
+    "qubit"
+   ],
+   "QUANT-03-003": [
+    "qubit"
+   ],
+   "QUANT-03-005": [
+    "qubit"
+   ],
+   "QUANT-03-013": [
+    "qubit"
+   ],
+   "QUANT-03-017": [
+    "qubit"
+   ],
+   "QUANT-07-009": [
+    "qubit"
+   ]
+  },
+  "energy-conversion": {
+   "BIO-01-006": [
+    "energy",
+    "atp",
+    "power"
+   ],
+   "BIO-01-007": [
+    "photosynthesis"
+   ],
+   "BIO-01-011": [
+    "atp"
+   ],
+   "BIO-04-003": [
+    "metabolism"
+   ],
+   "BIO-04-005": [
+    "energy"
+   ],
+   "BIO-04-006": [
+    "energy"
+   ],
+   "BIO-04-008": [
+    "energy",
+    "atp"
+   ],
+   "BIO-04-009": [
+    "energy",
+    "atp"
+   ],
+   "BIO-04-010": [
+    "energy",
+    "photosynthesis"
+   ],
+   "BIO-04-011": [
+    "atp"
+   ],
+   "BIO-07-008": [
+    "metabolism"
+   ],
+   "BIO-09-002": [
+    "energy"
+   ],
+   "CHEM-01-008": [
+    "energy"
+   ],
+   "CHEM-03-007": [
+    "energy"
+   ],
+   "CHEM-05-003": [
+    "energy"
+   ],
+   "CHEM-06-004": [
+    "energy"
+   ],
+   "CHEM-06-005": [
+    "energy"
+   ],
+   "CHEM-06-009": [
+    "energy"
+   ],
+   "CHEM-08-003": [
+    "metabolism"
+   ],
+   "CHEM-08-004": [
+    "electricity"
+   ],
+   "CHEM-08-005": [
+    "electricity"
+   ],
+   "CHEM-08-010": [
+    "energy",
+    "power",
+    "electricity"
+   ],
+   "CODE-06-011": [
+    "energy",
+    "power"
+   ],
+   "CODE-12-004": [
+    "power"
+   ],
+   "CODE-12-005": [
+    "energy"
+   ],
+   "CODE-12-008": [
+    "energy",
+    "power"
+   ],
+   "EARTH-01-003": [
+    "energy"
+   ],
+   "EARTH-07-001": [
+    "energy"
+   ],
+   "EARTH-07-007": [
+    "power",
+    "electricity"
+   ],
+   "EARTH-07-008": [
+    "power",
+    "electricity"
+   ],
+   "EARTH-07-009": [
+    "energy",
+    "power"
+   ],
+   "EARTH-07-011": [
+    "energy"
+   ],
+   "EARTH-07-012": [
+    "power"
+   ],
+   "ENG-01-010": [
+    "energy"
+   ],
+   "ENG-04-002": [
+    "power"
+   ],
+   "ENG-04-003": [
+    "energy",
+    "power"
+   ],
+   "ENG-04-004": [
+    "power",
+    "electricity"
+   ],
+   "ENG-04-005": [
+    "electricity"
+   ],
+   "ENG-04-006": [
+    "power"
+   ],
+   "ENG-04-009": [
+    "power"
+   ],
+   "ENG-06-001": [
+    "power"
+   ],
+   "ENG-06-003": [
+    "power"
+   ],
+   "ENG-06-005": [
+    "power"
+   ],
+   "ENG-06-009": [
+    "power"
+   ],
+   "MATH-03-012": [
+    "power"
+   ],
+   "MATH-10-004": [
+    "power"
+   ],
+   "MATH-11-014": [
+    "energy"
+   ],
+   "MATH-11-015": [
+    "energy"
+   ],
+   "MATH-12-005": [
+    "power"
+   ],
+   "MATH-12-006": [
+    "power"
+   ],
+   "MATH-12-015": [
+    "power"
+   ],
+   "MATH-13-005": [
+    "power"
+   ],
+   "MATH-13-010": [
+    "power"
+   ],
+   "MATH-15-013": [
+    "energy"
+   ],
+   "MATH-16-010": [
+    "power"
+   ],
+   "MATH-16-012": [
+    "power"
+   ],
+   "PHYS-01-003": [
+    "energy"
+   ],
+   "PHYS-02-001": [
+    "energy"
+   ],
+   "PHYS-02-002": [
+    "energy"
+   ],
+   "PHYS-02-007": [
+    "energy"
+   ],
+   "PHYS-02-009": [
+    "energy"
+   ],
+   "PHYS-03-003": [
+    "energy"
+   ],
+   "PHYS-03-008": [
+    "energy"
+   ],
+   "PHYS-05-004": [
+    "energy"
+   ],
+   "PHYS-05-006": [
+    "energy"
+   ],
+   "PHYS-05-007": [
+    "energy"
+   ],
+   "PHYS-06-003": [
+    "energy"
+   ],
+   "PHYS-06-005": [
+    "energy"
+   ],
+   "PHYS-07-003": [
+    "energy"
+   ],
+   "PHYS-07-006": [
+    "energy"
+   ],
+   "PHYS-07-009": [
+    "energy"
+   ],
+   "PHYS-08-001": [
+    "energy"
+   ],
+   "PHYS-08-002": [
+    "energy"
+   ],
+   "PHYS-08-005": [
+    "energy"
+   ],
+   "PHYS-08-008": [
+    "power"
+   ],
+   "PHYS-09-003": [
+    "energy"
+   ],
+   "PHYS-11-006": [
+    "energy"
+   ],
+   "PHYS-12-002": [
+    "energy"
+   ],
+   "PHYS-12-007": [
+    "energy",
+    "power"
+   ],
+   "PHYS-13-010": [
+    "energy"
+   ],
+   "PHYS-14-002": [
+    "energy"
+   ],
+   "PHYS-14-006": [
+    "energy"
+   ],
+   "PHYS-15-006": [
+    "energy"
+   ],
+   "PHYS-15-008": [
+    "power"
+   ],
+   "PHYS-15-009": [
+    "energy"
+   ],
+   "PHYS-17-004": [
+    "power"
+   ],
+   "PHYS-17-009": [
+    "energy"
+   ],
+   "PHYS-18-001": [
+    "energy"
+   ],
+   "PHYS-18-009": [
+    "atp"
+   ],
+   "PHYS-02-011": [
+    "energy"
+   ],
+   "PHYS-02-012": [
+    "energy"
+   ],
+   "PHYS-02-017": [
+    "energy"
+   ],
+   "PHYS-02-019": [
+    "energy"
+   ],
+   "PHYS-03-013": [
+    "energy"
+   ],
+   "PHYS-03-018": [
+    "energy"
+   ],
+   "PHYS-05-014": [
+    "energy"
+   ],
+   "PHYS-05-016": [
+    "energy"
+   ],
+   "PHYS-05-017": [
+    "energy"
+   ],
+   "QUANT-01-006": [
+    "energy"
+   ],
+   "QUANT-03-016": [
+    "energy"
+   ],
+   "QUANT-06-011": [
+    "energy"
+   ],
+   "QUANT-07-001": [
+    "energy"
+   ],
+   "QUANT-09-007": [
+    "photosynthesis"
+   ]
+  },
+  "networks": {
+   "BIO-01-009": [
+    "network"
+   ],
+   "CHEM-10-004": [
+    "network"
+   ],
+   "CHEM-11-003": [
+    "graph"
+   ],
+   "CODE-02-002": [
+    "node"
+   ],
+   "CODE-02-003": [
+    "node"
+   ],
+   "CODE-03-002": [
+    "network",
+    "graph"
+   ],
+   "CODE-03-010": [
+    "graph"
+   ],
+   "CODE-03-011": [
+    "graph"
+   ],
+   "CODE-04-003": [
+    "network"
+   ],
+   "CODE-04-006": [
+    "connectivity"
+   ],
+   "CODE-04-010": [
+    "node"
+   ],
+   "CODE-05-005": [
+    "edge"
+   ],
+   "CODE-06-013": [
+    "network",
+    "edge"
+   ],
+   "CODE-07-001": [
+    "network"
+   ],
+   "CODE-07-002": [
+    "network"
+   ],
+   "CODE-07-003": [
+    "network"
+   ],
+   "CODE-07-006": [
+    "network"
+   ],
+   "CODE-07-007": [
+    "network"
+   ],
+   "CODE-07-008": [
+    "network"
+   ],
+   "CODE-07-009": [
+    "network"
+   ],
+   "CODE-07-010": [
+    "network"
+   ],
+   "CODE-07-011": [
+    "node"
+   ],
+   "CODE-07-012": [
+    "network"
+   ],
+   "CODE-07-013": [
+    "network"
+   ],
+   "CODE-08-002": [
+    "graph"
+   ],
+   "CODE-08-006": [
+    "node"
+   ],
+   "CODE-08-010": [
+    "graph"
+   ],
+   "CODE-09-004": [
+    "network"
+   ],
+   "CODE-09-012": [
+    "edge"
+   ],
+   "CODE-10-001": [
+    "node"
+   ],
+   "CODE-10-002": [
+    "node"
+   ],
+   "CODE-10-007": [
+    "node"
+   ],
+   "CODE-10-010": [
+    "edge"
+   ],
+   "CODE-10-011": [
+    "edge"
+   ],
+   "CODE-11-004": [
+    "graph"
+   ],
+   "CODE-11-005": [
+    "graph"
+   ],
+   "CODE-11-009": [
+    "network"
+   ],
+   "CODE-11-013": [
+    "graph"
+   ],
+   "CODE-12-011": [
+    "edge"
+   ],
+   "EARTH-07-012": [
+    "network"
+   ],
+   "ENG-02-002": [
+    "edge"
+   ],
+   "ENG-09-001": [
+    "graph"
+   ],
+   "ENG-09-006": [
+    "network"
+   ],
+   "ENG-09-009": [
+    "graph"
+   ],
+   "MATH-01-009": [
+    "graph"
+   ],
+   "MATH-05-013": [
+    "edge"
+   ],
+   "MATH-07-012": [
+    "topology"
+   ],
+   "MATH-08-013": [
+    "graph"
+   ],
+   "MATH-16-013": [
+    "network",
+    "graph",
+    "edge"
+   ],
+   "MATH-16-014": [
+    "graph"
+   ],
+   "MATH-18-001": [
+    "network",
+    "graph",
+    "node",
+    "edge"
+   ],
+   "MATH-18-002": [
+    "graph"
+   ],
+   "MATH-18-003": [
+    "network",
+    "graph",
+    "edge"
+   ],
+   "MATH-18-004": [
+    "graph"
+   ],
+   "MATH-18-005": [
+    "edge"
+   ],
+   "MATH-18-006": [
+    "connectivity"
+   ],
+   "PHYS-04-007": [
+    "graph"
+   ],
+   "PHYS-11-004": [
+    "edge"
+   ],
+   "PHYS-11-008": [
+    "edge"
+   ],
+   "PHYS-18-010": [
+    "network",
+    "graph"
+   ],
+   "PHYS-04-017": [
+    "graph"
+   ],
+   "QUANT-02-006": [
+    "network"
+   ],
+   "QUANT-02-007": [
+    "graph"
+   ],
+   "QUANT-03-009": [
+    "graph"
+   ],
+   "QUANT-04-004": [
+    "graph"
+   ],
+   "QUANT-07-006": [
+    "graph"
+   ],
+   "QUANT-09-001": [
+    "edge"
+   ]
+  },
+  "balance": {
+   "BIO-01-010": [
+    "balanc"
+   ],
+   "BIO-07-009": [
+    "balanc"
+   ],
+   "CHEM-04-003": [
+    "balanc"
+   ],
+   "CODE-02-009": [
+    "balanc"
+   ],
+   "CODE-02-010": [
+    "balanc"
+   ],
+   "CODE-04-002": [
+    "balanc"
+   ],
+   "CODE-04-008": [
+    "balanc"
+   ],
+   "CODE-08-007": [
+    "balanc"
+   ],
+   "CODE-10-008": [
+    "balanc"
+   ],
+   "ENG-08-007": [
+    "balanc"
+   ],
+   "MATH-02-007": [
+    "balanc"
+   ],
+   "MATH-17-012": [
+    "balanc"
+   ],
+   "PHYS-09-001": [
+    "balanc"
+   ],
+   "PHYS-09-002": [
+    "balanc"
+   ],
+   "PHYS-14-001": [
+    "balanc"
+   ]
+  },
+  "amplification": {
+   "BIO-01-011": [
+    "gain"
+   ],
+   "BIO-02-013": [
+    "amplif",
+    "exponential"
+   ],
+   "CHEM-08-002": [
+    "gain"
+   ],
+   "CODE-08-012": [
+    "gain"
+   ],
+   "CODE-11-013": [
+    "gain"
+   ],
+   "CODE-12-002": [
+    "exponential"
+   ],
+   "ENG-05-003": [
+    "amplif"
+   ],
+   "ENG-05-008": [
+    "amplif"
+   ],
+   "ENG-06-006": [
+    "gain"
+   ],
+   "ENG-07-003": [
+    "gain"
+   ],
+   "ENG-08-002": [
+    "gain"
+   ],
+   "MATH-01-007": [
+    "exponential"
+   ],
+   "MATH-02-014": [
+    "exponential"
+   ],
+   "MATH-02-015": [
+    "exponential"
+   ],
+   "MATH-14-009": [
+    "exponential"
+   ],
+   "PHYS-04-008": [
+    "gain"
+   ],
+   "PHYS-08-005": [
+    "exponential"
+   ],
+   "PHYS-15-007": [
+    "exponential"
+   ],
+   "PHYS-04-018": [
+    "gain"
+   ],
+   "QUANT-03-009": [
+    "exponential"
+   ]
+  },
+  "standardization": {
+   "BIO-01-012": [
+    "identical"
+   ],
+   "CHEM-05-007": [
+    "standard"
+   ],
+   "CHEM-08-006": [
+    "standard"
+   ],
+   "CHEM-08-007": [
+    "standard"
+   ],
+   "CODE-07-002": [
+    "standard"
+   ],
+   "ENG-07-001": [
+    "identical",
+    "interchangeable"
+   ],
+   "ENG-07-003": [
+    "standard"
+   ],
+   "ENG-07-008": [
+    "standard"
+   ],
+   "ENG-08-002": [
+    "standard"
+   ],
+   "MATH-05-004": [
+    "congruen"
+   ],
+   "MATH-12-008": [
+    "uniform"
+   ],
+   "PHYS-05-008": [
+    "identical"
+   ],
+   "PHYS-13-001": [
+    "standard"
+   ],
+   "PHYS-13-007": [
+    "standard"
+   ],
+   "PHYS-05-018": [
+    "identical"
+   ],
+   "QUANT-05-006": [
+    "standard"
+   ],
+   "QUANT-06-001": [
+    "standard"
+   ],
+   "QUANT-08-004": [
+    "standard"
+   ]
+  },
+  "conservation": {
+   "BIO-02-004": [
+    "conserv"
+   ],
+   "BIO-09-004": [
+    "conserv"
+   ],
+   "BIO-09-010": [
+    "conserv"
+   ],
+   "CHEM-04-003": [
+    "conserv"
+   ],
+   "MATH-04-006": [
+    "invariant"
+   ],
+   "MATH-08-009": [
+    "invariant"
+   ],
+   "MATH-11-014": [
+    "conserv"
+   ],
+   "PHYS-01-004": [
+    "conserv"
+   ],
+   "PHYS-01-005": [
+    "conserv"
+   ],
+   "PHYS-01-009": [
+    "conserv"
+   ],
+   "PHYS-06-004": [
+    "invariant"
+   ],
+   "PHYS-06-007": [
+    "conserv",
+    "invariant"
+   ],
+   "PHYS-07-009": [
+    "conserv"
+   ],
+   "PHYS-08-007": [
+    "conserv"
+   ],
+   "PHYS-09-001": [
+    "conserv",
+    "continuity equation"
+   ],
+   "PHYS-09-003": [
+    "conserv"
+   ],
+   "PHYS-09-004": [
+    "conserv"
+   ],
+   "PHYS-16-005": [
+    "invariant"
+   ]
+  },
+  "waves": {
+   "BIO-03-004": [
+    "frequency"
+   ],
+   "CHEM-03-010": [
+    "resonan"
+   ],
+   "CHEM-11-004": [
+    "resonan"
+   ],
+   "CODE-04-004": [
+    "frequency"
+   ],
+   "CODE-05-011": [
+    "frequency"
+   ],
+   "CODE-08-009": [
+    "frequency"
+   ],
+   "ENG-05-007": [
+    "oscillat"
+   ],
+   "ENG-09-002": [
+    "wave"
+   ],
+   "ENG-09-004": [
+    "wave"
+   ],
+   "ENG-09-010": [
+    "interfer"
+   ],
+   "MATH-03-011": [
+    "vibrat"
+   ],
+   "MATH-09-014": [
+    "oscillat"
+   ],
+   "MATH-12-015": [
+    "fourier"
+   ],
+   "MATH-14-006": [
+    "oscillat"
+   ],
+   "MATH-15-003": [
+    "wave",
+    "vibrat"
+   ],
+   "MATH-15-006": [
+    "fourier"
+   ],
+   "MATH-15-007": [
+    "frequency",
+    "fourier"
+   ],
+   "MATH-15-009": [
+    "wave"
+   ],
+   "PHYS-01-007": [
+    "wave",
+    "oscillat",
+    "harmonic",
+    "vibrat"
+   ],
+   "PHYS-03-007": [
+    "wave"
+   ],
+   "PHYS-03-008": [
+    "wave"
+   ],
+   "PHYS-03-009": [
+    "wave"
+   ],
+   "PHYS-04-003": [
+    "wave",
+    "interfer"
+   ],
+   "PHYS-04-004": [
+    "wave"
+   ],
+   "PHYS-04-006": [
+    "interfer"
+   ],
+   "PHYS-04-007": [
+    "frequency",
+    "fourier"
+   ],
+   "PHYS-04-010": [
+    "frequency",
+    "harmonic"
+   ],
+   "PHYS-05-001": [
+    "wave"
+   ],
+   "PHYS-05-002": [
+    "wave"
+   ],
+   "PHYS-05-004": [
+    "oscillat",
+    "harmonic",
+    "vibrat"
+   ],
+   "PHYS-05-007": [
+    "wave"
+   ],
+   "PHYS-05-008": [
+    "wave"
+   ],
+   "PHYS-05-009": [
+    "wave"
+   ],
+   "PHYS-06-008": [
+    "frequency"
+   ],
+   "PHYS-07-005": [
+    "wave"
+   ],
+   "PHYS-07-010": [
+    "wave"
+   ],
+   "PHYS-09-008": [
+    "wave"
+   ],
+   "PHYS-10-002": [
+    "wave",
+    "oscillat",
+    "frequency"
+   ],
+   "PHYS-10-004": [
+    "wave"
+   ],
+   "PHYS-10-005": [
+    "wave",
+    "oscillat"
+   ],
+   "PHYS-11-002": [
+    "wave",
+    "fourier"
+   ],
+   "PHYS-11-003": [
+    "wave"
+   ],
+   "PHYS-12-008": [
+    "resonan"
+   ],
+   "PHYS-13-005": [
+    "oscillat"
+   ],
+   "PHYS-13-009": [
+    "resonan"
+   ],
+   "PHYS-14-005": [
+    "wave"
+   ],
+   "PHYS-15-003": [
+    "wave"
+   ],
+   "PHYS-16-004": [
+    "fourier"
+   ],
+   "PHYS-03-017": [
+    "wave"
+   ],
+   "PHYS-03-018": [
+    "wave"
+   ],
+   "PHYS-03-019": [
+    "wave"
+   ],
+   "PHYS-04-013": [
+    "wave",
+    "interfer"
+   ],
+   "PHYS-04-014": [
+    "wave"
+   ],
+   "PHYS-04-016": [
+    "interfer"
+   ],
+   "PHYS-04-017": [
+    "frequency",
+    "fourier"
+   ],
+   "PHYS-04-020": [
+    "frequency",
+    "harmonic"
+   ],
+   "PHYS-05-011": [
+    "wave"
+   ],
+   "PHYS-05-012": [
+    "wave"
+   ],
+   "PHYS-05-014": [
+    "oscillat",
+    "harmonic",
+    "vibrat"
+   ],
+   "PHYS-05-017": [
+    "wave"
+   ],
+   "PHYS-05-018": [
+    "wave"
+   ],
+   "PHYS-05-019": [
+    "wave"
+   ],
+   "QUANT-01-001": [
+    "wave"
+   ],
+   "QUANT-01-003": [
+    "wave"
+   ],
+   "QUANT-01-007": [
+    "wave"
+   ],
+   "QUANT-01-010": [
+    "interfer"
+   ],
+   "QUANT-03-008": [
+    "interfer"
+   ],
+   "QUANT-03-011": [
+    "fourier"
+   ],
+   "QUANT-05-002": [
+    "wave"
+   ],
+   "QUANT-08-001": [
+    "oscillat"
+   ],
+   "QUANT-08-003": [
+    "wave",
+    "interfer"
+   ],
+   "QUANT-08-005": [
+    "wave"
+   ],
+   "QUANT-09-001": [
+    "wave"
+   ],
+   "QUANT-09-003": [
+    "wave"
+   ],
+   "QUANT-09-005": [
+    "vibrat"
+   ]
+  },
+  "randomness": {
+   "BIO-03-004": [
+    "random"
+   ],
+   "CODE-02-001": [
+    "random"
+   ],
+   "CODE-03-008": [
+    "random"
+   ],
+   "CODE-03-011": [
+    "random"
+   ],
+   "CODE-04-011": [
+    "random"
+   ],
+   "ENG-09-010": [
+    "noise"
+   ],
+   "MATH-17-015": [
+    "probability"
+   ],
+   "PHYS-08-001": [
+    "probability"
+   ],
+   "PHYS-08-006": [
+    "noise"
+   ],
+   "PHYS-08-010": [
+    "stochastic"
+   ],
+   "PHYS-12-005": [
+    "probability"
+   ],
+   "PHYS-17-005": [
+    "random",
+    "stochastic",
+    "monte carlo"
+   ],
+   "QUANT-01-004": [
+    "probability"
+   ],
+   "QUANT-04-005": [
+    "random"
+   ]
+  },
+  "inverse": {
+   "BIO-03-008": [
+    "reciprocal"
+   ],
+   "CHEM-06-010": [
+    "reverse"
+   ],
+   "MATH-01-008": [
+    "inverse"
+   ],
+   "MATH-02-013": [
+    "inverse",
+    "reverse"
+   ],
+   "MATH-02-015": [
+    "inverse"
+   ],
+   "MATH-03-010": [
+    "inverse",
+    "reverse"
+   ],
+   "MATH-04-001": [
+    "inverse"
+   ],
+   "MATH-04-011": [
+    "inverse"
+   ],
+   "MATH-09-005": [
+    "reciprocal"
+   ],
+   "MATH-09-013": [
+    "inverse"
+   ],
+   "PHYS-02-010": [
+    "reciprocal"
+   ],
+   "PHYS-11-002": [
+    "reciprocal"
+   ],
+   "PHYS-02-020": [
+    "reciprocal"
+   ]
+  },
+  "composition": {
+   "BIO-04-001": [
+    "building block"
+   ],
+   "CHEM-09-014": [
+    "arrangement"
+   ],
+   "CODE-03-005": [
+    "combin"
+   ],
+   "CODE-03-006": [
+    "combin"
+   ],
+   "CODE-04-011": [
+    "combin"
+   ],
+   "CODE-08-013": [
+    "combin"
+   ],
+   "CODE-12-012": [
+    "combin"
+   ],
+   "ENG-05-003": [
+    "building block"
+   ],
+   "MATH-01-011": [
+    "building block"
+   ],
+   "MATH-01-014": [
+    "combin"
+   ],
+   "MATH-02-001": [
+    "combin"
+   ],
+   "MATH-03-004": [
+    "combin"
+   ],
+   "MATH-03-008": [
+    "combin"
+   ],
+   "MATH-04-004": [
+    "arrangement"
+   ],
+   "MATH-16-008": [
+    "arrangement"
+   ],
+   "MATH-16-009": [
+    "combin"
+   ],
+   "MATH-17-002": [
+    "arrangement"
+   ],
+   "MATH-17-003": [
+    "combin"
+   ],
+   "MATH-17-008": [
+    "combin"
+   ],
+   "MATH-17-012": [
+    "arrangement",
+    "combin"
+   ],
+   "PHYS-06-003": [
+    "combin"
+   ],
+   "PHYS-11-001": [
+    "arrangement"
+   ],
+   "QUANT-08-003": [
+    "combin"
+   ]
+  },
+  "coupling": {
+   "BIO-04-002": [
+    "link"
+   ],
+   "BIO-05-009": [
+    "link"
+   ],
+   "BIO-10-004": [
+    "link"
+   ],
+   "CHEM-04-010": [
+    "link"
+   ],
+   "CHEM-09-010": [
+    "link"
+   ],
+   "CHEM-10-005": [
+    "bind"
+   ],
+   "CODE-02-002": [
+    "link"
+   ],
+   "CODE-02-003": [
+    "link"
+   ],
+   "CODE-04-002": [
+    "link"
+   ],
+   "CODE-10-006": [
+    "coupl"
+   ],
+   "ENG-09-007": [
+    "link"
+   ],
+   "ENG-09-008": [
+    "link"
+   ],
+   "MATH-07-012": [
+    "link"
+   ],
+   "MATH-10-011": [
+    "link"
+   ],
+   "MATH-11-012": [
+    "link"
+   ],
+   "MATH-14-011": [
+    "interact"
+   ],
+   "MATH-16-002": [
+    "link"
+   ],
+   "MATH-18-001": [
+    "link"
+   ],
+   "PHYS-03-001": [
+    "interact"
+   ],
+   "PHYS-10-003": [
+    "coupl"
+   ],
+   "PHYS-10-010": [
+    "interact"
+   ],
+   "PHYS-11-007": [
+    "interact"
+   ],
+   "PHYS-12-002": [
+    "bind"
+   ],
+   "PHYS-13-001": [
+    "interact"
+   ],
+   "PHYS-13-003": [
+    "coupl"
+   ],
+   "PHYS-13-008": [
+    "interact"
+   ],
+   "PHYS-17-006": [
+    "interact"
+   ],
+   "PHYS-18-006": [
+    "interact"
+   ],
+   "PHYS-18-010": [
+    "interact"
+   ],
+   "PHYS-03-011": [
+    "interact"
+   ],
+   "QUANT-02-001": [
+    "link"
+   ],
+   "QUANT-05-003": [
+    "interact"
+   ],
+   "QUANT-06-005": [
+    "bind"
+   ],
+   "QUANT-06-007": [
+    "interact"
+   ],
+   "QUANT-07-009": [
+    "link"
+   ]
+  },
+  "decomposition": {
+   "BIO-04-003": [
+    "digest"
+   ],
+   "BIO-05-003": [
+    "decompos"
+   ],
+   "BIO-07-006": [
+    "digest"
+   ],
+   "CHEM-10-010": [
+    "decompos"
+   ],
+   "MATH-01-007": [
+    "decay"
+   ],
+   "MATH-02-014": [
+    "decay"
+   ],
+   "MATH-03-014": [
+    "decompos"
+   ],
+   "MATH-03-015": [
+    "decompos"
+   ],
+   "MATH-09-008": [
+    "decompos"
+   ],
+   "MATH-14-001": [
+    "decay"
+   ],
+   "MATH-17-011": [
+    "decompos"
+   ],
+   "PHYS-06-005": [
+    "decay"
+   ],
+   "PHYS-06-007": [
+    "decay"
+   ],
+   "PHYS-12-004": [
+    "decay"
+   ],
+   "PHYS-13-003": [
+    "decay"
+   ],
+   "PHYS-13-006": [
+    "decay"
+   ],
+   "PHYS-16-004": [
+    "decompos"
+   ],
+   "PHYS-17-003": [
+    "decompos"
+   ],
+   "PHYS-17-010": [
+    "decompos"
+   ],
+   "QUANT-06-006": [
+    "decay"
+   ]
+  },
+  "entropy": {
+   "BIO-04-007": [
+    "information"
+   ],
+   "BIO-07-005": [
+    "disorder"
+   ],
+   "BIO-07-009": [
+    "disorder"
+   ],
+   "CHEM-05-002": [
+    "entrop",
+    "disorder"
+   ],
+   "CODE-08-010": [
+    "information"
+   ],
+   "CODE-09-008": [
+    "information"
+   ],
+   "CODE-12-003": [
+    "information"
+   ],
+   "ENG-09-003": [
+    "information"
+   ],
+   "ENG-09-010": [
+    "information"
+   ],
+   "PHYS-02-001": [
+    "entrop"
+   ],
+   "PHYS-02-002": [
+    "entrop",
+    "disorder",
+    "second law"
+   ],
+   "PHYS-05-003": [
+    "uncertainty"
+   ],
+   "PHYS-05-010": [
+    "information"
+   ],
+   "PHYS-06-006": [
+    "second law"
+   ],
+   "PHYS-06-010": [
+    "entrop"
+   ],
+   "PHYS-08-001": [
+    "entrop"
+   ],
+   "PHYS-11-010": [
+    "entrop"
+   ],
+   "PHYS-18-001": [
+    "entrop"
+   ],
+   "PHYS-02-011": [
+    "entrop"
+   ],
+   "PHYS-02-012": [
+    "entrop",
+    "disorder",
+    "second law"
+   ],
+   "PHYS-05-013": [
+    "uncertainty"
+   ],
+   "QUANT-01-005": [
+    "uncertainty"
+   ],
+   "QUANT-03-001": [
+    "information"
+   ]
+  },
+  "separation": {
+   "BIO-07-009": [
+    "filter"
+   ],
+   "BIO-08-010": [
+    "separat"
+   ],
+   "CHEM-11-003": [
+    "separat",
+    "purif"
+   ],
+   "CODE-01-007": [
+    "separat"
+   ],
+   "CODE-04-003": [
+    "filter"
+   ],
+   "CODE-04-007": [
+    "extract"
+   ],
+   "CODE-06-007": [
+    "isolate"
+   ],
+   "CODE-07-008": [
+    "separat"
+   ],
+   "EARTH-02-003": [
+    "extract"
+   ],
+   "EARTH-02-007": [
+    "extract"
+   ],
+   "EARTH-02-008": [
+    "separat"
+   ],
+   "EARTH-03-001": [
+    "extract"
+   ],
+   "EARTH-04-003": [
+    "purif"
+   ],
+   "EARTH-04-004": [
+    "filter"
+   ],
+   "EARTH-04-006": [
+    "distill"
+   ],
+   "EARTH-08-007": [
+    "extract"
+   ],
+   "ENG-06-010": [
+    "filter"
+   ],
+   "MATH-06-002": [
+    "separat"
+   ],
+   "MATH-10-006": [
+    "isolate"
+   ],
+   "MATH-14-002": [
+    "separat"
+   ],
+   "MATH-14-007": [
+    "separat"
+   ],
+   "MATH-15-005": [
+    "separat"
+   ],
+   "PHYS-01-004": [
+    "isolate"
+   ],
+   "PHYS-02-002": [
+    "isolate"
+   ],
+   "PHYS-04-007": [
+    "filter"
+   ],
+   "PHYS-07-009": [
+    "isolate"
+   ],
+   "PHYS-08-001": [
+    "isolate"
+   ],
+   "PHYS-08-009": [
+    "extract"
+   ],
+   "PHYS-02-012": [
+    "isolate"
+   ],
+   "PHYS-04-017": [
+    "filter"
+   ],
+   "QUANT-03-008": [
+    "extract"
+   ]
+  },
+  "emergence": {
+   "BIO-08-007": [
+    "emergen"
+   ],
+   "CODE-12-012": [
+    "collective"
+   ],
+   "PHYS-01-008": [
+    "complex system"
+   ],
+   "PHYS-10-002": [
+    "collective"
+   ]
+  },
+  "geometry": {
+   "BIO-08-009": [
+    "curv"
+   ],
+   "CHEM-01-012": [
+    "geometry"
+   ],
+   "CHEM-03-009": [
+    "geometry"
+   ],
+   "CHEM-11-006": [
+    "metric"
+   ],
+   "CODE-03-010": [
+    "geometry",
+    "metric"
+   ],
+   "CODE-04-009": [
+    "angle"
+   ],
+   "CODE-05-012": [
+    "metric"
+   ],
+   "CODE-07-007": [
+    "metric"
+   ],
+   "CODE-11-001": [
+    "metric"
+   ],
+   "CODE-11-002": [
+    "metric"
+   ],
+   "CODE-11-007": [
+    "metric"
+   ],
+   "CODE-12-001": [
+    "angle"
+   ],
+   "MATH-03-002": [
+    "metric"
+   ],
+   "MATH-03-013": [
+    "angle"
+   ],
+   "MATH-05-001": [
+    "metric"
+   ],
+   "MATH-05-002": [
+    "angle"
+   ],
+   "MATH-05-003": [
+    "triangle",
+    "angle"
+   ],
+   "MATH-05-006": [
+    "triangle",
+    "angle"
+   ],
+   "MATH-05-013": [
+    "metric",
+    "angle"
+   ],
+   "MATH-05-014": [
+    "triangle",
+    "angle"
+   ],
+   "MATH-05-015": [
+    "geometry",
+    "triangle",
+    "angle"
+   ],
+   "MATH-06-001": [
+    "geometry"
+   ],
+   "MATH-06-007": [
+    "curv"
+   ],
+   "MATH-06-008": [
+    "metric"
+   ],
+   "MATH-06-012": [
+    "curv"
+   ],
+   "MATH-07-001": [
+    "curv"
+   ],
+   "MATH-07-002": [
+    "curv"
+   ],
+   "MATH-07-003": [
+    "curv"
+   ],
+   "MATH-07-006": [
+    "manifold"
+   ],
+   "MATH-07-007": [
+    "metric"
+   ],
+   "MATH-07-008": [
+    "curv"
+   ],
+   "MATH-07-009": [
+    "curv"
+   ],
+   "MATH-07-010": [
+    "curv"
+   ],
+   "MATH-07-011": [
+    "geodes"
+   ],
+   "MATH-07-012": [
+    "curv",
+    "geometry"
+   ],
+   "MATH-07-014": [
+    "metric",
+    "manifold"
+   ],
+   "MATH-07-015": [
+    "metric"
+   ],
+   "MATH-08-013": [
+    "curv"
+   ],
+   "MATH-09-001": [
+    "angle"
+   ],
+   "MATH-09-004": [
+    "angle"
+   ],
+   "MATH-09-006": [
+    "metric",
+    "angle"
+   ],
+   "MATH-09-008": [
+    "angle"
+   ],
+   "MATH-09-009": [
+    "angle"
+   ],
+   "MATH-09-010": [
+    "angle"
+   ],
+   "MATH-09-011": [
+    "triangle",
+    "angle"
+   ],
+   "MATH-09-012": [
+    "triangle",
+    "angle"
+   ],
+   "MATH-09-013": [
+    "metric",
+    "angle"
+   ],
+   "MATH-09-014": [
+    "metric"
+   ],
+   "MATH-10-006": [
+    "curv"
+   ],
+   "MATH-10-010": [
+    "curv"
+   ],
+   "MATH-11-009": [
+    "curv"
+   ],
+   "MATH-12-012": [
+    "curv"
+   ],
+   "MATH-13-002": [
+    "metric"
+   ],
+   "MATH-13-007": [
+    "curv"
+   ],
+   "MATH-13-008": [
+    "curv"
+   ],
+   "MATH-13-012": [
+    "angle"
+   ],
+   "MATH-15-008": [
+    "curv"
+   ],
+   "MATH-16-004": [
+    "metric"
+   ],
+   "MATH-16-005": [
+    "metric"
+   ],
+   "PHYS-02-004": [
+    "curv"
+   ],
+   "PHYS-03-005": [
+    "metric"
+   ],
+   "PHYS-04-001": [
+    "metric"
+   ],
+   "PHYS-05-008": [
+    "metric"
+   ],
+   "PHYS-05-010": [
+    "angle"
+   ],
+   "PHYS-07-001": [
+    "curv",
+    "geodes"
+   ],
+   "PHYS-07-002": [
+    "curv",
+    "geodes",
+    "metric"
+   ],
+   "PHYS-07-003": [
+    "curv",
+    "metric"
+   ],
+   "PHYS-07-004": [
+    "metric"
+   ],
+   "PHYS-07-007": [
+    "curv",
+    "geodes"
+   ],
+   "PHYS-11-004": [
+    "curv"
+   ],
+   "PHYS-14-010": [
+    "curv"
+   ],
+   "PHYS-15-001": [
+    "metric"
+   ],
+   "PHYS-15-005": [
+    "curv"
+   ],
+   "PHYS-16-007": [
+    "curv"
+   ],
+   "PHYS-02-014": [
+    "curv"
+   ],
+   "PHYS-03-015": [
+    "metric"
+   ],
+   "PHYS-04-011": [
+    "metric"
+   ],
+   "PHYS-05-018": [
+    "metric"
+   ],
+   "QUANT-02-001": [
+    "angle"
+   ],
+   "QUANT-02-003": [
+    "angle"
+   ],
+   "QUANT-02-004": [
+    "angle"
+   ],
+   "QUANT-02-006": [
+    "angle"
+   ],
+   "QUANT-02-007": [
+    "angle"
+   ],
+   "QUANT-03-002": [
+    "metric"
+   ],
+   "QUANT-03-005": [
+    "angle"
+   ]
+  },
+  "symmetry": {
+   "BIO-09-004": [
+    "conservation"
+   ],
+   "BIO-09-010": [
+    "conservation"
+   ],
+   "CODE-11-001": [
+    "symmetr"
+   ],
+   "CODE-11-002": [
+    "symmetr"
+   ],
+   "MATH-04-001": [
+    "symmetr"
+   ],
+   "MATH-04-002": [
+    "symmetr"
+   ],
+   "MATH-04-003": [
+    "symmetr"
+   ],
+   "MATH-04-006": [
+    "invariant"
+   ],
+   "MATH-05-012": [
+    "symmetr"
+   ],
+   "MATH-06-009": [
+    "symmetr"
+   ],
+   "MATH-08-009": [
+    "invariant"
+   ],
+   "MATH-16-004": [
+    "symmetr"
+   ],
+   "MATH-16-005": [
+    "symmetr"
+   ],
+   "PHYS-01-004": [
+    "conservation"
+   ],
+   "PHYS-01-005": [
+    "conservation"
+   ],
+   "PHYS-02-008": [
+    "symmetr"
+   ],
+   "PHYS-03-002": [
+    "symmetr"
+   ],
+   "PHYS-03-005": [
+    "symmetr"
+   ],
+   "PHYS-05-008": [
+    "symmetr"
+   ],
+   "PHYS-06-004": [
+    "invariant"
+   ],
+   "PHYS-06-007": [
+    "invariant",
+    "conservation"
+   ],
+   "PHYS-07-004": [
+    "symmetr"
+   ],
+   "PHYS-08-007": [
+    "conservation"
+   ],
+   "PHYS-09-001": [
+    "conservation"
+   ],
+   "PHYS-09-003": [
+    "conservation"
+   ],
+   "PHYS-09-004": [
+    "conservation"
+   ],
+   "PHYS-13-001": [
+    "symmetr"
+   ],
+   "PHYS-13-003": [
+    "symmetr"
+   ],
+   "PHYS-13-006": [
+    "symmetr"
+   ],
+   "PHYS-13-007": [
+    "symmetr"
+   ],
+   "PHYS-16-005": [
+    "invariant"
+   ],
+   "PHYS-16-010": [
+    "symmetr"
+   ],
+   "PHYS-02-018": [
+    "symmetr"
+   ],
+   "PHYS-03-012": [
+    "symmetr"
+   ],
+   "PHYS-03-015": [
+    "symmetr"
+   ],
+   "PHYS-05-018": [
+    "symmetr"
+   ],
+   "QUANT-05-006": [
+    "symmetr"
+   ]
+  },
+  "periodicity": {
+   "BIO-09-006": [
+    "cycle"
+   ],
+   "BIO-09-007": [
+    "cycle"
+   ],
+   "BIO-09-008": [
+    "cycle"
+   ],
+   "CHEM-01-005": [
+    "periodic"
+   ],
+   "CHEM-01-011": [
+    "periodic"
+   ],
+   "CHEM-01-012": [
+    "orbit"
+   ],
+   "CODE-11-005": [
+    "cycle"
+   ],
+   "EARTH-01-001": [
+    "cycle"
+   ],
+   "ENG-06-003": [
+    "cycle"
+   ],
+   "ENG-09-008": [
+    "orbit"
+   ],
+   "MATH-06-007": [
+    "orbit"
+   ],
+   "MATH-09-003": [
+    "periodic"
+   ],
+   "MATH-18-005": [
+    "cycle"
+   ],
+   "PHYS-01-005": [
+    "orbit"
+   ],
+   "PHYS-01-006": [
+    "orbit"
+   ],
+   "PHYS-02-009": [
+    "cycle"
+   ],
+   "PHYS-05-005": [
+    "orbit"
+   ],
+   "PHYS-07-007": [
+    "orbit"
+   ],
+   "PHYS-11-001": [
+    "periodic"
+   ],
+   "PHYS-11-003": [
+    "periodic"
+   ],
+   "PHYS-14-010": [
+    "orbit"
+   ],
+   "PHYS-02-019": [
+    "cycle"
+   ],
+   "PHYS-05-015": [
+    "orbit"
+   ]
+  },
+  "transformation": {
+   "BIO-10-005": [
+    "mapping"
+   ],
+   "CHEM-01-006": [
+    "convert"
+   ],
+   "CHEM-04-001": [
+    "convert"
+   ],
+   "CODE-09-004": [
+    "transform"
+   ],
+   "EARTH-01-001": [
+    "transform"
+   ],
+   "EARTH-01-008": [
+    "mapping"
+   ],
+   "EARTH-07-008": [
+    "convert"
+   ],
+   "EARTH-08-007": [
+    "mapping"
+   ],
+   "ENG-04-006": [
+    "transform"
+   ],
+   "ENG-05-006": [
+    "convert"
+   ],
+   "ENG-08-008": [
+    "mapping"
+   ],
+   "MATH-02-010": [
+    "mapping"
+   ],
+   "MATH-02-012": [
+    "transform"
+   ],
+   "MATH-03-006": [
+    "transform"
+   ],
+   "MATH-03-008": [
+    "transform"
+   ],
+   "MATH-05-011": [
+    "transform"
+   ],
+   "MATH-05-012": [
+    "transform"
+   ],
+   "MATH-06-010": [
+    "transform"
+   ],
+   "MATH-09-007": [
+    "convert"
+   ],
+   "MATH-11-001": [
+    "mapping"
+   ],
+   "MATH-11-008": [
+    "transform"
+   ],
+   "MATH-11-011": [
+    "convert"
+   ],
+   "MATH-11-013": [
+    "convert"
+   ],
+   "MATH-12-015": [
+    "fourier"
+   ],
+   "MATH-13-002": [
+    "transform"
+   ],
+   "MATH-13-012": [
+    "mapping"
+   ],
+   "MATH-14-012": [
+    "transform",
+    "laplace",
+    "convert"
+   ],
+   "MATH-15-004": [
+    "laplace"
+   ],
+   "MATH-15-006": [
+    "fourier"
+   ],
+   "MATH-15-007": [
+    "transform",
+    "fourier",
+    "convert"
+   ],
+   "MATH-16-003": [
+    "mapping"
+   ],
+   "MATH-18-004": [
+    "isomorphism"
+   ],
+   "PHYS-01-009": [
+    "transform"
+   ],
+   "PHYS-02-007": [
+    "transform"
+   ],
+   "PHYS-03-006": [
+    "transform"
+   ],
+   "PHYS-04-007": [
+    "fourier"
+   ],
+   "PHYS-06-001": [
+    "transform",
+    "convert"
+   ],
+   "PHYS-06-003": [
+    "transform"
+   ],
+   "PHYS-06-010": [
+    "transform"
+   ],
+   "PHYS-11-002": [
+    "transform",
+    "fourier"
+   ],
+   "PHYS-16-002": [
+    "transform"
+   ],
+   "PHYS-16-004": [
+    "transform",
+    "fourier"
+   ],
+   "PHYS-16-005": [
+    "transform",
+    "laplace",
+    "convert"
+   ],
+   "PHYS-02-017": [
+    "transform"
+   ],
+   "PHYS-03-016": [
+    "transform"
+   ],
+   "PHYS-04-017": [
+    "fourier"
+   ],
+   "QUANT-03-011": [
+    "transform",
+    "fourier"
+   ]
+  },
+  "optimization": {
+   "CHEM-04-004": [
+    "maxim"
+   ],
+   "CHEM-06-008": [
+    "optim"
+   ],
+   "CODE-02-011": [
+    "optim"
+   ],
+   "CODE-03-001": [
+    "efficient"
+   ],
+   "CODE-03-002": [
+    "optim"
+   ],
+   "CODE-03-003": [
+    "optim"
+   ],
+   "CODE-03-004": [
+    "optim"
+   ],
+   "CODE-03-006": [
+    "optim"
+   ],
+   "CODE-03-009": [
+    "optim"
+   ],
+   "CODE-04-001": [
+    "efficient"
+   ],
+   "CODE-04-003": [
+    "efficient"
+   ],
+   "CODE-04-005": [
+    "minim",
+    "maxim"
+   ],
+   "CODE-04-007": [
+    "efficient"
+   ],
+   "CODE-04-008": [
+    "optim"
+   ],
+   "CODE-04-012": [
+    "efficient"
+   ],
+   "CODE-06-002": [
+    "efficient"
+   ],
+   "CODE-08-002": [
+    "optim"
+   ],
+   "CODE-08-005": [
+    "optim",
+    "minim",
+    "efficient"
+   ],
+   "CODE-09-003": [
+    "optim"
+   ],
+   "CODE-12-011": [
+    "optim"
+   ],
+   "CODE-12-012": [
+    "optim"
+   ],
+   "ENG-01-003": [
+    "efficient"
+   ],
+   "MATH-03-005": [
+    "minim"
+   ],
+   "MATH-03-015": [
+    "least squares"
+   ],
+   "MATH-06-011": [
+    "optim"
+   ],
+   "MATH-07-010": [
+    "minim"
+   ],
+   "MATH-10-004": [
+    "efficient"
+   ],
+   "MATH-10-007": [
+    "optim"
+   ],
+   "MATH-13-013": [
+    "maxim"
+   ],
+   "MATH-14-008": [
+    "efficient"
+   ],
+   "MATH-14-009": [
+    "efficient"
+   ],
+   "MATH-14-010": [
+    "efficient"
+   ],
+   "MATH-17-004": [
+    "efficient"
+   ],
+   "PHYS-02-010": [
+    "efficient"
+   ],
+   "PHYS-04-006": [
+    "minim"
+   ],
+   "PHYS-07-002": [
+    "efficient"
+   ],
+   "PHYS-02-020": [
+    "efficient"
+   ],
+   "PHYS-04-016": [
+    "minim"
+   ],
+   "QUANT-03-016": [
+    "optim"
+   ]
+  },
+  "measurement": {
+   "CHEM-04-009": [
+    "measur"
+   ],
+   "CHEM-05-005": [
+    "measur"
+   ],
+   "CHEM-06-001": [
+    "measur"
+   ],
+   "CHEM-11-006": [
+    "measur"
+   ],
+   "CHEM-11-007": [
+    "measur"
+   ],
+   "CHEM-11-008": [
+    "measur"
+   ],
+   "CODE-04-009": [
+    "detect"
+   ],
+   "CODE-05-012": [
+    "measur"
+   ],
+   "CODE-06-006": [
+    "detect"
+   ],
+   "CODE-07-013": [
+    "sensor"
+   ],
+   "CODE-09-008": [
+    "detect"
+   ],
+   "CODE-10-013": [
+    "observ",
+    "instrument"
+   ],
+   "CODE-11-009": [
+    "sensor",
+    "detect"
+   ],
+   "CODE-12-004": [
+    "sensor"
+   ],
+   "EARTH-05-003": [
+    "instrument"
+   ],
+   "EARTH-05-008": [
+    "instrument"
+   ],
+   "ENG-02-003": [
+    "measur"
+   ],
+   "ENG-05-006": [
+    "sensor"
+   ],
+   "ENG-07-003": [
+    "measur"
+   ],
+   "ENG-08-002": [
+    "measur"
+   ],
+   "ENG-08-003": [
+    "measur"
+   ],
+   "ENG-08-004": [
+    "measur"
+   ],
+   "ENG-08-007": [
+    "measur"
+   ],
+   "ENG-08-008": [
+    "measur"
+   ],
+   "MATH-03-013": [
+    "measur"
+   ],
+   "MATH-05-002": [
+    "measur"
+   ],
+   "MATH-05-009": [
+    "measur"
+   ],
+   "MATH-05-010": [
+    "measur"
+   ],
+   "MATH-06-002": [
+    "measur"
+   ],
+   "MATH-06-004": [
+    "measur"
+   ],
+   "MATH-06-012": [
+    "detect"
+   ],
+   "MATH-07-002": [
+    "measur"
+   ],
+   "MATH-07-007": [
+    "measur"
+   ],
+   "MATH-07-014": [
+    "measur"
+   ],
+   "MATH-08-011": [
+    "detect"
+   ],
+   "MATH-09-001": [
+    "measur"
+   ],
+   "MATH-10-003": [
+    "measur"
+   ],
+   "MATH-12-009": [
+    "measur"
+   ],
+   "MATH-12-013": [
+    "measur"
+   ],
+   "MATH-12-014": [
+    "measur"
+   ],
+   "PHYS-02-008": [
+    "measur"
+   ],
+   "PHYS-05-003": [
+    "observ"
+   ],
+   "PHYS-06-008": [
+    "observ"
+   ],
+   "PHYS-07-005": [
+    "detect"
+   ],
+   "PHYS-07-007": [
+    "observ"
+   ],
+   "PHYS-07-008": [
+    "measur"
+   ],
+   "PHYS-10-005": [
+    "measur",
+    "probe"
+   ],
+   "PHYS-10-007": [
+    "probe"
+   ],
+   "PHYS-11-009": [
+    "measur"
+   ],
+   "PHYS-12-009": [
+    "measur",
+    "detect"
+   ],
+   "PHYS-13-008": [
+    "detect"
+   ],
+   "PHYS-13-010": [
+    "measur",
+    "detect"
+   ],
+   "PHYS-15-009": [
+    "measur"
+   ],
+   "PHYS-02-018": [
+    "measur"
+   ],
+   "PHYS-05-013": [
+    "observ"
+   ],
+   "QUANT-01-002": [
+    "measur"
+   ],
+   "QUANT-01-004": [
+    "measur"
+   ],
+   "QUANT-01-008": [
+    "measur",
+    "observ"
+   ],
+   "QUANT-01-011": [
+    "measur",
+    "observ"
+   ],
+   "QUANT-04-001": [
+    "detect"
+   ],
+   "QUANT-08-003": [
+    "measur",
+    "instrument"
+   ],
+   "QUANT-08-004": [
+    "measur"
+   ],
+   "QUANT-08-005": [
+    "detect"
+   ],
+   "QUANT-09-001": [
+    "measur"
+   ]
+  },
+  "hierarchy": {
+   "CODE-01-004": [
+    "hierarch",
+    "encapsulat"
+   ],
+   "CODE-01-007": [
+    "modular"
+   ],
+   "CODE-03-011": [
+    "modular"
+   ],
+   "CODE-06-003": [
+    "hierarch"
+   ],
+   "CODE-07-001": [
+    "layer"
+   ],
+   "CODE-09-004": [
+    "layer"
+   ],
+   "EARTH-01-006": [
+    "layer"
+   ],
+   "EARTH-05-001": [
+    "layer"
+   ],
+   "EARTH-06-001": [
+    "layer"
+   ],
+   "ENG-02-009": [
+    "layer"
+   ],
+   "MATH-01-009": [
+    "modular"
+   ],
+   "MATH-16-014": [
+    "hierarch"
+   ],
+   "PHYS-04-006": [
+    "layer"
+   ],
+   "PHYS-09-005": [
+    "layer"
+   ],
+   "PHYS-10-007": [
+    "layer"
+   ],
+   "PHYS-13-005": [
+    "hierarch"
+   ],
+   "PHYS-13-007": [
+    "hierarch"
+   ],
+   "PHYS-04-016": [
+    "layer"
+   ]
+  },
+  "discreteness": {
+   "CODE-02-001": [
+    "integer"
+   ],
+   "CODE-04-003": [
+    "packet"
+   ],
+   "CODE-07-004": [
+    "packet"
+   ],
+   "CODE-09-012": [
+    "quantiz"
+   ],
+   "CODE-11-004": [
+    "digital"
+   ],
+   "ENG-05-007": [
+    "digital"
+   ],
+   "ENG-09-006": [
+    "packet"
+   ],
+   "MATH-01-001": [
+    "discrete",
+    "integer",
+    "counting"
+   ],
+   "MATH-01-002": [
+    "integer"
+   ],
+   "MATH-01-010": [
+    "integer"
+   ],
+   "MATH-01-011": [
+    "integer"
+   ],
+   "MATH-01-012": [
+    "integer"
+   ],
+   "MATH-01-013": [
+    "integer"
+   ],
+   "MATH-01-014": [
+    "integer"
+   ],
+   "MATH-04-008": [
+    "integer"
+   ],
+   "MATH-08-006": [
+    "counting"
+   ],
+   "MATH-10-014": [
+    "discrete"
+   ],
+   "MATH-12-002": [
+    "discrete"
+   ],
+   "MATH-13-015": [
+    "counting"
+   ],
+   "MATH-16-006": [
+    "counting"
+   ],
+   "MATH-17-001": [
+    "counting"
+   ],
+   "MATH-17-008": [
+    "counting"
+   ],
+   "MATH-17-010": [
+    "counting"
+   ],
+   "MATH-17-011": [
+    "integer"
+   ],
+   "PHYS-05-004": [
+    "quantiz"
+   ],
+   "PHYS-05-005": [
+    "quantiz"
+   ],
+   "PHYS-11-009": [
+    "quantiz"
+   ],
+   "PHYS-17-007": [
+    "discrete"
+   ],
+   "PHYS-05-014": [
+    "quantiz"
+   ],
+   "PHYS-05-015": [
+    "quantiz"
+   ],
+   "QUANT-01-006": [
+    "packet",
+    "quantiz"
+   ],
+   "QUANT-05-002": [
+    "quantiz"
+   ],
+   "QUANT-08-001": [
+    "counting"
+   ],
+   "QUANT-09-006": [
+    "quantiz"
+   ]
+  },
+  "linearity": {
+   "CODE-02-002": [
+    "linear"
+   ],
+   "CODE-12-001": [
+    "superposition"
+   ],
+   "MATH-02-002": [
+    "linear"
+   ],
+   "MATH-02-007": [
+    "linear"
+   ],
+   "MATH-03-002": [
+    "vector space"
+   ],
+   "MATH-03-003": [
+    "linear",
+    "vector space"
+   ],
+   "MATH-03-004": [
+    "linear"
+   ],
+   "MATH-03-006": [
+    "linear"
+   ],
+   "MATH-03-007": [
+    "linear",
+    "matrix"
+   ],
+   "MATH-03-008": [
+    "linear",
+    "matrix"
+   ],
+   "MATH-03-009": [
+    "matrix"
+   ],
+   "MATH-03-010": [
+    "linear",
+    "matrix"
+   ],
+   "MATH-03-012": [
+    "matrix"
+   ],
+   "MATH-03-013": [
+    "vector space"
+   ],
+   "MATH-04-013": [
+    "linear",
+    "vector space"
+   ],
+   "MATH-04-014": [
+    "vector space"
+   ],
+   "MATH-06-004": [
+    "linear"
+   ],
+   "MATH-06-005": [
+    "linear"
+   ],
+   "MATH-07-013": [
+    "linear"
+   ],
+   "MATH-10-007": [
+    "linear"
+   ],
+   "MATH-11-005": [
+    "linear"
+   ],
+   "MATH-14-003": [
+    "linear"
+   ],
+   "MATH-14-005": [
+    "linear"
+   ],
+   "MATH-14-006": [
+    "linear"
+   ],
+   "MATH-15-010": [
+    "superposition"
+   ],
+   "PHYS-01-005": [
+    "linear"
+   ],
+   "PHYS-02-010": [
+    "linear"
+   ],
+   "PHYS-04-003": [
+    "superposition"
+   ],
+   "PHYS-04-005": [
+    "matrix"
+   ],
+   "PHYS-04-010": [
+    "linear"
+   ],
+   "PHYS-05-003": [
+    "linear"
+   ],
+   "PHYS-06-001": [
+    "linear"
+   ],
+   "PHYS-13-006": [
+    "matrix"
+   ],
+   "PHYS-16-005": [
+    "linear"
+   ],
+   "PHYS-16-007": [
+    "linear"
+   ],
+   "PHYS-16-008": [
+    "superposition"
+   ],
+   "PHYS-17-001": [
+    "linear"
+   ],
+   "PHYS-17-003": [
+    "linear"
+   ],
+   "PHYS-18-007": [
+    "linear"
+   ],
+   "PHYS-02-020": [
+    "linear"
+   ],
+   "PHYS-04-013": [
+    "superposition"
+   ],
+   "PHYS-04-015": [
+    "matrix"
+   ],
+   "PHYS-04-020": [
+    "linear"
+   ],
+   "PHYS-05-013": [
+    "linear"
+   ],
+   "QUANT-01-002": [
+    "superposition"
+   ],
+   "QUANT-01-011": [
+    "superposition"
+   ],
+   "QUANT-03-004": [
+    "superposition"
+   ],
+   "QUANT-03-007": [
+    "superposition"
+   ]
+  },
+  "approximation": {
+   "CODE-02-010": [
+    "approximat"
+   ],
+   "CODE-03-009": [
+    "approximat"
+   ],
+   "CODE-12-005": [
+    "approximat"
+   ],
+   "MATH-02-004": [
+    "approximat"
+   ],
+   "MATH-10-007": [
+    "approximat"
+   ],
+   "MATH-11-005": [
+    "approximat"
+   ],
+   "MATH-12-004": [
+    "approximat"
+   ],
+   "MATH-12-011": [
+    "approximat",
+    "taylor"
+   ],
+   "MATH-14-015": [
+    "numerical"
+   ],
+   "MATH-15-014": [
+    "approximat",
+    "numerical"
+   ],
+   "MATH-15-015": [
+    "numerical"
+   ],
+   "PHYS-05-006": [
+    "approximat",
+    "perturbation"
+   ],
+   "PHYS-05-007": [
+    "approximat"
+   ],
+   "PHYS-07-009": [
+    "numerical",
+    "asymptotic"
+   ],
+   "PHYS-07-010": [
+    "numerical"
+   ],
+   "PHYS-09-009": [
+    "approximat"
+   ],
+   "PHYS-09-010": [
+    "numerical"
+   ],
+   "PHYS-10-004": [
+    "perturbation"
+   ],
+   "PHYS-11-004": [
+    "approximat"
+   ],
+   "PHYS-15-008": [
+    "perturbation"
+   ],
+   "PHYS-17-001": [
+    "approximat",
+    "numerical",
+    "interpolat"
+   ],
+   "PHYS-05-016": [
+    "approximat",
+    "perturbation"
+   ],
+   "PHYS-05-017": [
+    "approximat"
+   ]
+  },
+  "recursion": {
+   "CODE-03-003": [
+    "dynamic programming"
+   ],
+   "CODE-03-005": [
+    "recursi",
+    "divide and conquer"
+   ],
+   "ENG-05-010": [
+    "divide and conquer"
+   ],
+   "PHYS-03-006": [
+    "induction"
+   ],
+   "PHYS-03-016": [
+    "induction"
+   ]
+  },
+  "duality": {
+   "CODE-03-011": [
+    "primal"
+   ],
+   "MATH-14-007": [
+    "complement"
+   ],
+   "MATH-16-001": [
+    "complement"
+   ],
+   "PHYS-05-001": [
+    "dual",
+    "wave-particle"
+   ],
+   "PHYS-05-011": [
+    "dual",
+    "wave-particle"
+   ],
+   "QUANT-01-001": [
+    "dual",
+    "wave-particle"
+   ]
+  },
+  "scaling": {
+   "CODE-04-009": [
+    "dimensional"
+   ],
+   "CODE-05-008": [
+    "scaling"
+   ],
+   "CODE-09-002": [
+    "dimensional"
+   ],
+   "CODE-10-008": [
+    "scaling"
+   ],
+   "ENG-07-002": [
+    "scaling"
+   ],
+   "MATH-01-006": [
+    "scaling"
+   ],
+   "MATH-03-009": [
+    "scaling"
+   ],
+   "MATH-05-005": [
+    "scaling"
+   ],
+   "MATH-05-010": [
+    "dimensional"
+   ],
+   "MATH-06-010": [
+    "scaling"
+   ],
+   "MATH-07-006": [
+    "dimensional"
+   ],
+   "PHYS-08-008": [
+    "scaling"
+   ],
+   "PHYS-08-009": [
+    "scaling",
+    "renormal"
+   ],
+   "PHYS-17-005": [
+    "dimensional"
+   ],
+   "PHYS-17-010": [
+    "scaling"
+   ],
+   "QUANT-05-005": [
+    "renormal"
+   ],
+   "QUANT-08-004": [
+    "scaling"
+   ]
+  },
+  "extension": {
+   "CODE-05-004": [
+    "extend"
+   ],
+   "MATH-04-008": [
+    "generaliz"
+   ],
+   "MATH-04-014": [
+    "generaliz"
+   ],
+   "MATH-08-008": [
+    "generaliz"
+   ],
+   "MATH-11-012": [
+    "generaliz"
+   ],
+   "MATH-13-006": [
+    "extend",
+    "continuation"
+   ],
+   "MATH-17-004": [
+    "generaliz"
+   ],
+   "PHYS-01-008": [
+    "generaliz"
+   ],
+   "PHYS-15-005": [
+    "extend"
+   ],
+   "PHYS-16-002": [
+    "generaliz"
+   ]
+  },
+  "threshold": {
+   "CODE-06-010": [
+    "critical"
+   ],
+   "CODE-08-003": [
+    "critical"
+   ],
+   "CODE-09-013": [
+    "critical"
+   ],
+   "EARTH-08-006": [
+    "critical"
+   ],
+   "PHYS-02-004": [
+    "phase transition"
+   ],
+   "PHYS-08-008": [
+    "phase transition",
+    "critical"
+   ],
+   "PHYS-09-007": [
+    "threshold"
+   ],
+   "PHYS-12-006": [
+    "critical"
+   ],
+   "PHYS-13-010": [
+    "threshold"
+   ],
+   "PHYS-02-014": [
+    "phase transition"
+   ],
+   "QUANT-04-005": [
+    "critical"
+   ],
+   "QUANT-07-008": [
+    "critical"
+   ]
+  },
+  "hidden": {
+   "CODE-09-002": [
+    "hidden"
+   ],
+   "PHYS-02-004": [
+    "latent"
+   ],
+   "PHYS-07-008": [
+    "dark matter"
+   ],
+   "PHYS-13-007": [
+    "dark matter"
+   ],
+   "PHYS-13-008": [
+    "dark matter"
+   ],
+   "PHYS-14-010": [
+    "dark matter"
+   ],
+   "PHYS-15-005": [
+    "dark matter"
+   ],
+   "PHYS-02-014": [
+    "latent"
+   ],
+   "QUANT-02-002": [
+    "hidden"
+   ],
+   "QUANT-06-010": [
+    "invisible",
+    "dark matter"
+   ]
+  },
+  "unification": {
+   "MATH-04-013": [
+    "unif"
+   ],
+   "MATH-12-008": [
+    "unif"
+   ],
+   "PHYS-03-007": [
+    "unif"
+   ],
+   "PHYS-06-004": [
+    "unif"
+   ],
+   "PHYS-03-017": [
+    "unif"
+   ],
+   "QUANT-09-004": [
+    "unif"
+   ]
+  },
+  "extremum": {
+   "MATH-12-010": [
+    "extrem"
+   ],
+   "MATH-15-014": [
+    "variational"
+   ],
+   "PHYS-04-002": [
+    "variational"
+   ],
+   "PHYS-05-007": [
+    "variational"
+   ],
+   "PHYS-16-009": [
+    "lagrange",
+    "variational"
+   ],
+   "PHYS-04-012": [
+    "variational"
+   ],
+   "PHYS-05-017": [
+    "variational"
+   ]
+  }
+ },
+ "unmatched": [
+  "BIO-01-001",
+  "BIO-01-002",
+  "BIO-01-003",
+  "BIO-01-008",
+  "BIO-02-006",
+  "BIO-02-009",
+  "BIO-02-010",
+  "BIO-02-011",
+  "BIO-02-012",
+  "BIO-03-001",
+  "BIO-03-002",
+  "BIO-03-003",
+  "BIO-03-005",
+  "BIO-03-006",
+  "BIO-03-007",
+  "BIO-03-009",
+  "BIO-03-010",
+  "BIO-04-004",
+  "BIO-04-012",
+  "BIO-05-001",
+  "BIO-05-002",
+  "BIO-05-004",
+  "BIO-05-005",
+  "BIO-05-006",
+  "BIO-05-007",
+  "BIO-05-008",
+  "BIO-06-003",
+  "BIO-06-004",
+  "BIO-06-005",
+  "BIO-06-006",
+  "BIO-06-007",
+  "BIO-06-009",
+  "BIO-06-010",
+  "BIO-07-001",
+  "BIO-07-004",
+  "BIO-07-007",
+  "BIO-07-011",
+  "BIO-08-001",
+  "BIO-08-002",
+  "BIO-08-003",
+  "BIO-08-004",
+  "BIO-08-005",
+  "BIO-08-006",
+  "BIO-08-008",
+  "BIO-08-012",
+  "BIO-09-001",
+  "BIO-09-003",
+  "BIO-09-005",
+  "BIO-09-009",
+  "BIO-10-001",
+  "BIO-10-002",
+  "BIO-10-003",
+  "BIO-10-007",
+  "BIO-10-008",
+  "CHEM-01-001",
+  "CHEM-01-002",
+  "CHEM-01-004",
+  "CHEM-01-007",
+  "CHEM-01-009",
+  "CHEM-01-010",
+  "CHEM-02-001",
+  "CHEM-02-002",
+  "CHEM-02-003",
+  "CHEM-02-004",
+  "CHEM-02-005",
+  "CHEM-02-006",
+  "CHEM-02-007",
+  "CHEM-02-008",
+  "CHEM-02-009",
+  "CHEM-02-010",
+  "CHEM-03-001",
+  "CHEM-03-002",
+  "CHEM-03-003",
+  "CHEM-03-005",
+  "CHEM-03-006",
+  "CHEM-04-002",
+  "CHEM-04-005",
+  "CHEM-04-006",
+  "CHEM-04-007",
+  "CHEM-04-008",
+  "CHEM-05-001",
+  "CHEM-05-004",
+  "CHEM-05-006",
+  "CHEM-05-008",
+  "CHEM-06-002",
+  "CHEM-06-003",
+  "CHEM-06-006",
+  "CHEM-06-007",
+  "CHEM-07-001",
+  "CHEM-07-002",
+  "CHEM-07-003",
+  "CHEM-07-004",
+  "CHEM-07-005",
+  "CHEM-07-007",
+  "CHEM-07-008",
+  "CHEM-07-009",
+  "CHEM-07-010",
+  "CHEM-08-008",
+  "CHEM-08-009",
+  "CHEM-09-001",
+  "CHEM-09-002",
+  "CHEM-09-003",
+  "CHEM-09-005",
+  "CHEM-09-006",
+  "CHEM-09-007",
+  "CHEM-09-008",
+  "CHEM-09-009",
+  "CHEM-09-011",
+  "CHEM-09-012",
+  "CHEM-09-013",
+  "CHEM-09-015",
+  "CHEM-10-001",
+  "CHEM-10-002",
+  "CHEM-10-003",
+  "CHEM-10-006",
+  "CHEM-10-007",
+  "CHEM-10-008",
+  "CHEM-10-009",
+  "CHEM-11-001",
+  "CHEM-11-002",
+  "CHEM-11-005",
+  "CODE-01-001",
+  "CODE-01-003",
+  "CODE-01-005",
+  "CODE-01-006",
+  "CODE-01-010",
+  "CODE-01-011",
+  "CODE-01-012",
+  "CODE-02-004",
+  "CODE-02-005",
+  "CODE-02-006",
+  "CODE-02-007",
+  "CODE-02-008",
+  "CODE-03-007",
+  "CODE-03-013",
+  "CODE-04-013",
+  "CODE-05-003",
+  "CODE-05-006",
+  "CODE-05-007",
+  "CODE-05-009",
+  "CODE-05-013",
+  "CODE-06-001",
+  "CODE-06-004",
+  "CODE-06-008",
+  "CODE-06-009",
+  "CODE-06-012",
+  "CODE-08-001",
+  "CODE-08-004",
+  "CODE-08-008",
+  "CODE-09-001",
+  "CODE-09-005",
+  "CODE-09-007",
+  "CODE-09-009",
+  "CODE-09-010",
+  "CODE-09-011",
+  "CODE-10-003",
+  "CODE-10-004",
+  "CODE-10-005",
+  "CODE-11-003",
+  "CODE-11-006",
+  "CODE-11-008",
+  "CODE-11-010",
+  "CODE-11-011",
+  "CODE-11-012",
+  "CODE-12-007",
+  "CODE-12-009",
+  "CODE-12-010",
+  "CODE-12-013",
+  "EARTH-01-004",
+  "EARTH-01-005",
+  "EARTH-01-007",
+  "EARTH-02-001",
+  "EARTH-02-002",
+  "EARTH-02-004",
+  "EARTH-02-005",
+  "EARTH-02-006",
+  "EARTH-02-009",
+  "EARTH-02-010",
+  "EARTH-03-002",
+  "EARTH-03-003",
+  "EARTH-03-004",
+  "EARTH-03-005",
+  "EARTH-03-006",
+  "EARTH-03-007",
+  "EARTH-03-008",
+  "EARTH-03-009",
+  "EARTH-03-010",
+  "EARTH-04-001",
+  "EARTH-04-002",
+  "EARTH-04-005",
+  "EARTH-04-007",
+  "EARTH-04-008",
+  "EARTH-04-010",
+  "EARTH-05-002",
+  "EARTH-05-004",
+  "EARTH-05-006",
+  "EARTH-05-007",
+  "EARTH-06-002",
+  "EARTH-06-003",
+  "EARTH-06-005",
+  "EARTH-06-006",
+  "EARTH-06-007",
+  "EARTH-06-008",
+  "EARTH-07-002",
+  "EARTH-07-004",
+  "EARTH-07-005",
+  "EARTH-07-010",
+  "EARTH-08-001",
+  "EARTH-08-002",
+  "EARTH-08-003",
+  "EARTH-08-004",
+  "EARTH-08-005",
+  "EARTH-08-008",
+  "ENG-01-001",
+  "ENG-01-002",
+  "ENG-01-004",
+  "ENG-01-006",
+  "ENG-01-007",
+  "ENG-01-008",
+  "ENG-01-009",
+  "ENG-01-011",
+  "ENG-01-012",
+  "ENG-02-001",
+  "ENG-02-004",
+  "ENG-02-005",
+  "ENG-02-006",
+  "ENG-02-007",
+  "ENG-02-008",
+  "ENG-02-010",
+  "ENG-03-001",
+  "ENG-03-002",
+  "ENG-03-003",
+  "ENG-03-004",
+  "ENG-03-005",
+  "ENG-03-006",
+  "ENG-03-007",
+  "ENG-03-009",
+  "ENG-03-010",
+  "ENG-04-007",
+  "ENG-04-010",
+  "ENG-05-004",
+  "ENG-05-009",
+  "ENG-06-002",
+  "ENG-06-004",
+  "ENG-06-007",
+  "ENG-06-008",
+  "ENG-07-004",
+  "ENG-07-005",
+  "ENG-07-006",
+  "ENG-08-001",
+  "ENG-08-006",
+  "ENG-08-009",
+  "ENG-09-005",
+  "MATH-01-003",
+  "MATH-01-004",
+  "MATH-01-005",
+  "MATH-01-015",
+  "MATH-02-003",
+  "MATH-02-005",
+  "MATH-02-006",
+  "MATH-02-008",
+  "MATH-02-009",
+  "MATH-02-011",
+  "MATH-03-001",
+  "MATH-04-005",
+  "MATH-04-007",
+  "MATH-04-009",
+  "MATH-04-010",
+  "MATH-04-012",
+  "MATH-04-015",
+  "MATH-05-007",
+  "MATH-05-008",
+  "MATH-06-003",
+  "MATH-06-006",
+  "MATH-06-013",
+  "MATH-06-014",
+  "MATH-06-015",
+  "MATH-07-004",
+  "MATH-07-005",
+  "MATH-08-001",
+  "MATH-08-002",
+  "MATH-08-003",
+  "MATH-08-004",
+  "MATH-08-005",
+  "MATH-08-007",
+  "MATH-08-010",
+  "MATH-08-012",
+  "MATH-08-014",
+  "MATH-08-015",
+  "MATH-09-002",
+  "MATH-09-015",
+  "MATH-10-001",
+  "MATH-10-002",
+  "MATH-10-005",
+  "MATH-10-008",
+  "MATH-10-009",
+  "MATH-10-012",
+  "MATH-10-013",
+  "MATH-10-015",
+  "MATH-11-002",
+  "MATH-11-004",
+  "MATH-11-007",
+  "MATH-12-001",
+  "MATH-12-003",
+  "MATH-12-007",
+  "MATH-13-001",
+  "MATH-13-003",
+  "MATH-13-004",
+  "MATH-13-009",
+  "MATH-13-011",
+  "MATH-13-014",
+  "MATH-14-004",
+  "MATH-14-014",
+  "MATH-15-001",
+  "MATH-15-011",
+  "MATH-15-012",
+  "MATH-16-007",
+  "MATH-16-011",
+  "MATH-16-015",
+  "MATH-17-005",
+  "MATH-17-006",
+  "MATH-17-007",
+  "MATH-17-009",
+  "MATH-17-013",
+  "MATH-17-014",
+  "PHYS-01-001",
+  "PHYS-01-002",
+  "PHYS-02-003",
+  "PHYS-02-005",
+  "PHYS-02-006",
+  "PHYS-03-010",
+  "PHYS-04-009",
+  "PHYS-06-002",
+  "PHYS-06-009",
+  "PHYS-08-004",
+  "PHYS-10-001",
+  "PHYS-10-006",
+  "PHYS-10-009",
+  "PHYS-11-005",
+  "PHYS-12-001",
+  "PHYS-12-010",
+  "PHYS-13-002",
+  "PHYS-13-004",
+  "PHYS-14-003",
+  "PHYS-14-004",
+  "PHYS-14-008",
+  "PHYS-15-002",
+  "PHYS-15-004",
+  "PHYS-15-010",
+  "PHYS-16-003",
+  "PHYS-16-006",
+  "PHYS-17-008",
+  "PHYS-18-002",
+  "PHYS-02-013",
+  "PHYS-02-015",
+  "PHYS-02-016",
+  "PHYS-03-020",
+  "PHYS-04-019",
+  "QUANT-01-009",
+  "QUANT-01-012",
+  "QUANT-02-008",
+  "QUANT-03-006",
+  "QUANT-03-010",
+  "QUANT-03-012",
+  "QUANT-03-014",
+  "QUANT-03-015",
+  "QUANT-04-002",
+  "QUANT-04-003",
+  "QUANT-05-001",
+  "QUANT-05-004",
+  "QUANT-05-007",
+  "QUANT-05-008",
+  "QUANT-06-002",
+  "QUANT-06-003",
+  "QUANT-06-004",
+  "QUANT-06-008",
+  "QUANT-06-009",
+  "QUANT-07-002",
+  "QUANT-07-005",
+  "QUANT-07-007",
+  "QUANT-08-002",
+  "QUANT-09-002"
+ ],
+ "stats": {
+  "topics": 1101,
+  "patterns": 36,
+  "matched": 719,
+  "unmatched": 382,
+  "cross_domain": 36
+ }
+}

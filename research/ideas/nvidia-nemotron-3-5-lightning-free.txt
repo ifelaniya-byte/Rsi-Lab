@@ -1,0 +1,33 @@
+# nvidia/nemotron-3.5-lightning:free
+# role: fast iterator
+
+Here's a thinking process:
+
+1.  **Analyze User Request:**
+   - **Role:** nvidia/nemotron-3.5-lightning:free (fast iterator) on a 19-model AI lab team
+   - **Task:** Bring back SINGLE best latest or unproven idea for recursive self-improvement (AI rewriting its own code to get smarter)
+   - **Source:** Recent Reddit, Twitter/X, or research chatter
+   - **Rules:**
+     (1) Specific and actionable, not vague
+     (2) Prefer newer/unproven ideas over well-known ones
+     (3) Under 250 words
+   - **Format Exactly:**
+     IDEA: <name>
+     HOW: <mechanism in 2-3 sentences>
+     WHY: <why it might beat current approaches, 1-2 sentences>
+
+2.  **Identify Key Constraints:**
+   - Must be specific and actionable
+   - Must be newer/unproven, not standard "gradient descent" or "architecture search"
+   - Under 250 words total
+   - Exact format with three sections: IDEA, HOW, WHY
+   - One single best idea
+
+3.  **Brainstorm / Search for "Recent Recursive Self-Improvement Ideas" (Mental Sandbox):**
+   - I need to think of what's actually been discussed recently on Reddit/Twitter/X or in research chatter.
+   - Some recent trends: "Self-referential training", "Meta-learning of architecture and hyperparameters online", "Gradient-free code editing via LLM self-editing", "Distribution shift as a self-improvement signal", "RL on code execution traces for architecture modification", "Token-level self-distillation with reflection", "Neural architecture search via LLM prompt engineering that loops", "Online meta-plasticity where weights change based on prediction error in a structured way".
+   - Let's think about what's genuinely "new/unproven" and "specific/actionable".
+   - One idea that's been popping up: "Online Self-Rewriting via Execution-Error-Gradient Propagation" or something similar. Actually, a hot topic is LLMs writing/fixing their own code based on runtime errors, but that's already happening.
+   - More novel: "Circuits-of-Thought" self-modification, or "Meta-Gradient on Activation Patterns" for structural change.
+   - Let's consider "Self-Referential Loss Shaping" where the model modifies its own weight update direction based on a secondary "improvement loss" that measures future prediction accuracy on a held-out set, creating a loop.
+   - Another: "Programmable Weight Distillation" where the model generates a compact "student" sub-network of its own activations and rewires itself to match,

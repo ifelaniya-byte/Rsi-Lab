@@ -1,0 +1,4 @@
+# cohere/north-mini-code:free
+# role: code reviewer
+
+IDEA: Self‑Modifying Code Generator (SM‑

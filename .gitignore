@@ -1,0 +1,35 @@
+# RSI Lab — public mirror. The answer key NEVER leaves the local machine.
+# See README.md for what is intentionally excluded and why.
+
+# Answer keys and eval integrity (local only)
+harness/solutions.json
+harness/heldout.json
+
+# Operational logs and local state
+logs/
+loop/logs/
+.watcher-state.json
+loop/.solver_cache.jsonl
+loop/.solver_sandbox_cache/
+harness/__pycache__/
+loop/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Wish raw API dumps (large, regenerable)
+*.raw.json
+
+# Credentials and secrets
+*.pem
+*.key
+.env
+credentials*.json
+*token*.json
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Message board runtime state (local)
+/message-board/*.json
+!/message-board/README.md

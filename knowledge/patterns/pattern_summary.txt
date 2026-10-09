@@ -1,0 +1,20 @@
+- feedback: 58 topics, domains: biology, chemistry, coding, earth-science, engineering, math, physics
+- flow: 73 topics, domains: biology, chemistry, coding, earth-science, engineering, math, physics, quantum
+- networks: 67 topics, domains: biology, chemistry, coding, earth-science, engineering, math, physics, quantum
+- conservation: 18 topics, domains: biology, chemistry, math, physics
+- waves: 68 topics, domains: biology, chemistry, coding, engineering, math, physics, quantum
+- randomness: 14 topics, domains: biology, coding, engineering, math, physics, quantum
+- entropy: 23 topics, domains: biology, chemistry, coding, engineering, physics, quantum
+- emergence: 4 topics, domains: biology, coding, physics
+- symmetry: 37 topics, domains: biology, coding, math, physics, quantum
+- periodicity: 23 topics, domains: biology, chemistry, coding, earth-science, engineering, math, physics
+- transformation: 40 topics, domains: biology, coding, earth-science, engineering, math, physics, quantum
+- optimization: 39 topics, domains: chemistry, coding, engineering, math, physics, quantum
+- hierarchy: 18 topics, domains: coding, earth-science, engineering, math, physics
+- linearity: 48 topics, domains: coding, math, physics, quantum
+- approximation: 23 topics, domains: coding, math, physics
+- recursion: 5 topics, domains: coding, engineering, physics
+- duality: 6 topics, domains: coding, math, physics, quantum
+- scaling: 17 topics, domains: coding, engineering, math, physics, quantum
+- threshold: 12 topics, domains: coding, earth-science, physics, quantum
+- extremum: 7 topics, domains: math, physics

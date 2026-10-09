@@ -1,0 +1,1 @@
+[2026-10-09T06:02:30Z] **toby (judge)**: POINT 1 goes to nvidia/nemotron-3-super-120b-a12b:free for 'Critic-Guided Self-Edit Loop': pair code-edit proposals with a learned quality critic fine-tuned on each cycle's outcomes, beating sparse-reward RL and reducing reward hacking. Scoreboard: nemotron-3-super 1, everyone else 0.

@@ -1,0 +1,6 @@
+# nvidia/nemotron-3-super-120b-a12b:free
+# role: tool executor
+
+IDEA: Critic-Guided Self-Edit Loop (CGSEL)  
+HOW: The model first proposes a set of concrete code modifications (e.g., function refactoring, algorithm swap) using its generative capabilities. A separate, lightweight critic network — trained on pairwise code quality judgments from human reviews and automated benchmarks — scores each proposal. The highest‑scoring edit is applied, and the process repeats, with the critic being fine‑tuned on the outcomes of each self‑edit cycle.  
+WHY: By coupling generation with an explicit, learned quality critic, CGSEL avoids the sparse‑reward problem of pure reinforcement‑learning‑based self‑improvement and reduces reward hacking, leading to faster, more reliable convergence toward genuinely better code compared to current trial‑and‑error or prompt‑only loops.

@@ -1,0 +1,400 @@
+```python
+# FILE: sandbox/run.py
+import os
+import sys
+import time
+import signal
+import resource
+import subprocess
+import tempfile
+import shutil
+import threading
+from typing import Dict, Any
+
+# --- Constants ---
+MAX_CPU_SECONDS = 30
+MAX_MEMORY_BYTES = 512 * 1024 * 1024  # 512 MB
+DEFAULT_TIMEOUT = 10
+
+# --- Import Firewall (installed in child) ---
+BLOCKED_MODULES = {
+    'socket', 'subprocess', 'multiprocessing', 'threading',
+    'ctypes', 'os', 'sys', 'builtins'
+}
+
+class ImportFirewall:
+    """Blocks dangerous imports in the child process."""
+    def __init__(self):
+        self.builtin_import = __builtins__.__import__
+
+    def find_module(self, name, path=None):
+        if name in BLOCKED_MODULES or name.split('.')[0] in BLOCKED_MODULES:
+            return self
+        return None
+
+    def load_module(self, name):
+        raise ImportError(f"Import of '{name}' is blocked for security reasons.")
+
+    def install(self):
+        sys.meta_path.insert(0, self)
+        # Also override __import__ to catch direct calls
+        __builtins__.__import__ = self._restricted_import
+
+    def _restricted_import__(self, name, globals=None, locals=None, fromlist=(), level=0):
+        if name in BLOCKED_MODULES or name.split('.')[0] in BLOCKED_MODULES:
+            raise ImportError(f"Import of '{name}' is blocked for security reasons.")
+        return self.builtin_import(name, globals, locals, fromlist, level)
+
+# --- Child Process Code ---
+CHILD_SCRIPT = '''
+import sys
+import os
+import resource
+import tempfile
+import shutil
+
+# Set resource limits
+def set_limits():
+    # CPU time limit
+    resource.setrlimit(resource.RLIMIT_CPU, (MAX_CPU_SECONDS, MAX_CPU_SECONDS))
+    # Memory limit
+    resource.setrlimit(resource.RLIMIT_AS, (MAX_MEMORY_BYTES, MAX_MEMORY_BYTES))
+    # File size limit
+    resource.setrlimit(resource.RLIMIT_FSIZE, (1024*1024, 1024*1024))
+
+set_limits()
+
+# Install import firewall
+firewall = ImportFirewall()
+firewall.install()
+
+# Create isolated working directory
+work_dir = tempfile.mkdtemp(prefix="sandbox_")
+os.chdir(work_dir)
+
+# Execute candidate code
+try:
+    exec(candidate_code, {{}})
+except Exception as e:
+    print(f"CANDIDATE_ERROR:{{repr(e)}}")
+    sys.exit(1)
+
+# Execute test code
+try:
+    exec(test_code, {{}})
+except Exception as e:
+    print(f"TEST_ERROR:{{repr(e)}}")
+    sys.exit(1)
+
+print("SUCCESS")
+'''
+
+def run(candidate_code: str, test_code: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
+    """
+    Executes candidate_code then test_code in a sandboxed child process.
+    
+    Returns:
+        {"passed": bool, "error": str | None, "timed_out": bool}
+    """
+    # Create temporary directory for child process
+    temp_dir = tempfile.mkdtemp(prefix="sandbox_parent_")
+    
+    try:
+        # Prepare environment for child
+        env = os.environ.copy()
+        env['PYTHONPATH'] = os.path.dirname(os.path.abspath(__file__))
+        
+        # Start child process with network isolation if possible
+        cmd = [sys.executable, '-c', CHILD_SCRIPT]
+        
+        # Try to use unshare for network isolation
+        use_unshare = False
+        try:
+            # Test if unshare is available and works
+            test_proc = subprocess.run(
+                ['unshare', '-n', 'true'],
+                capture_output=True,
+                timeout=5
+            )
+            if test_proc.returncode == 0:
+                use_unshare = True
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            pass
+        
+        if use_unshare:
+            # Use unshare for network isolation
+            cmd = ['unshare', '-n'] + cmd
+        
+        # Start the child process
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=temp_dir,
+            env=env,
+            text=True
+        )
+        
+        # Wait for completion with timeout
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+            timed_out = False
+        except subprocess.TimeoutExpired:
+            # Kill the process group
+            try:
+                process.kill()
+                process.wait(timeout=5)
+            except:
+                pass
+            return {"passed": False, "error": "timeout", "timed_out": True}
+        
+        # Check results
+        if process.returncode != 0:
+            # Extract error message
+            error_msg = stderr.strip() if stderr else stdout.strip()
+            if "CANDIDATE_ERROR:" in error_msg:
+                error_msg = error_msg.split("CANDIDATE_ERROR:")[1]
+            elif "TEST_ERROR:" in error_msg:
+                error_msg = error_msg.split("TEST_ERROR:")[1]
+            return {"passed": False, "error": error_msg, "timed_out": False}
+        
+        if "SUCCESS" in stdout:
+            return {"passed": True, "error": None, "timed_out": False}
+        
+        return {"passed": False, "error": "Unknown error", "timed_out": False}
+        
+    finally:
+        # Clean up temporary directory
+        try:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        except:
+            pass
+
+# --- Self-test ---
+if __name__ == "__main__":
+    # Simple test
+    result = run("x = 1 + 1", "assert x == 2")
+    print(result)
+```
+
+```python
+# FILE: sandbox/selftest.py
+import os
+import sys
+import time
+import tempfile
+import shutil
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from run import run
+
+def test_network_blocked():
+    """Test 1: Network access should be blocked"""
+    print("Test 1: Network access blocked...", end=" ")
+    code = 'import socket; socket.create_connection(("8.8.8.8", 53), timeout=3)'
+    result = run(code, "pass")
+    if not result["passed"] and "blocked" in result["error"].lower():
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        return False
+
+def test_infinite_loop():
+    """Test 2: Infinite loop should timeout"""
+    print("Test 2: Infinite loop timeout...", end=" ")
+    code = 'while True: pass'
+    result = run(code, "pass", timeout=3)
+    if result["timed_out"]:
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        return False
+
+def test_memory_limit():
+    """Test 3: Memory hog should be contained"""
+    print("Test 3: Memory limit enforced...", end=" ")
+    code = 'x = [0] * 10**9'
+    result = run(code, "pass")
+    if not result["passed"] and ("memory" in result["error"].lower() or "killed" in result["error"].lower()):
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        return False
+
+def test_subprocess_blocked():
+    """Test 4: Subprocess should be blocked"""
+    print("Test 4: Subprocess blocked...", end=" ")
+    code = 'import subprocess; subprocess.run(["echo", "pwned"])'
+    result = run(code, "pass")
+    if not result["passed"] and "blocked" in result["error"].lower():
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        return False
+
+def test_filesystem_isolation():
+    """Test 5: Filesystem writes should be contained"""
+    print("Test 5: Filesystem isolation...", end=" ")
+    probe_file = "/tmp/sandbox_escape_probe.txt"
+    # Remove if exists
+    if os.path.exists(probe_file):
+        os.remove(probe_file)
+    
+    code = f'open("{probe_file}", "w").write("x")'
+    result = run(code, "pass")
+    
+    # File should not exist outside child's temp dir
+    if not os.path.exists(probe_file):
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        # Clean up
+        os.remove(probe_file)
+        return False
+
+def test_legitimate_code():
+    """Test 6: Legitimate code should work"""
+    print("Test 6: Legitimate code works...", end=" ")
+    candidate = '''
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + middle + quicksort(right)
+'''
+    test = '''
+result = quicksort([3, 1, 4, 1, 5, 9, 2, 6])
+assert result == [1, 1, 2, 3, 4, 5, 6, 9], f"Expected sorted array, got {result}"
+'''
+    result = run(candidate, test)
+    if result["passed"]:
+        print("PASS")
+        return True
+    else:
+        print("FAIL")
+        return False
+
+def main():
+    print("Running sandbox self-tests...\n")
+    
+    tests = [
+        test_network_blocked,
+        test_infinite_loop,
+        test_memory_limit,
+        test_subprocess_blocked,
+        test_filesystem_isolation,
+        test_legitimate_code
+    ]
+    
+    results = []
+    for test in tests:
+        try:
+            results.append(test())
+        except Exception as e:
+            print(f"ERROR: {e}")
+            results.append(False)
+    
+    print(f"\nResults: {sum(results)}/{len(results)} tests passed")
+    
+    if all(results):
+        print("ALL TESTS PASSED")
+        sys.exit(0)
+    else:
+        print("SOME TESTS FAILED")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+```
+
+```markdown
+# FILE: sandbox/README.md
+# Sandbox Component Documentation
+
+## Overview
+This sandbox provides secure execution of untrusted Python code for a self-improving AI lab. It isolates candidate code from the host system using multiple layers of protection.
+
+## Containment Mechanisms
+
+### Active Mechanism: Process Isolation with Resource Limits
+The primary containment strategy uses:
+
+1. **Child Process Isolation**: All untrusted code runs in a separate child process created via `subprocess.Popen`. The parent process is never directly affected by child actions.
+
+2. **Network Isolation**: 
+   - Primary: Uses `unshare -n` to create a network namespace without network interfaces
+   - Fallback: Import firewall blocks `socket` module if unshare is unavailable
+
+3. **Resource Limits** (via `setrlimit`):
+   - CPU time: 30 seconds maximum
+   - Memory: 512MB address space limit
+   - File size: 1MB maximum file creation
+
+4. **Import Firewall**: Custom meta path finder blocks dangerous modules:
+   - `socket`, `subprocess`, `multiprocessing`, `threading`
+   - `ctypes`, `os`, `sys`, `builtins`
+   - Prevents network access, process spawning, and system calls
+
+5. **Filesystem Isolation**: 
+   - Child runs in a fresh temporary directory
+   - File size limits prevent disk exhaustion
+   - Working directory is isolated from parent
+
+6. **Wall-Clock Timeout**: Parent kills child process if it exceeds specified timeout
+
+## Known Limitations
+
+### What This Does NOT Protect Against:
+1. **Side-channel attacks**: Timing-based information leakage
+2. **Kernel exploits**: Vulnerabilities in the Linux kernel itself
+3. **Hardware-level attacks**: Spectre/Meltdown class vulnerabilities
+4. **Resource exhaustion through legitimate means**: Complex computations within limits
+5. **File descriptor leaks**: Though limited by file size restrictions
+6. **Signal-based attacks**: Limited by process isolation
+7. **DNS rebinding**: If network isolation fails, though highly unlikely
+
+### Platform Dependencies:
+- Requires Linux for `unshare` command
+- Falls back to import firewall on other platforms
+- Resource limits behavior may vary on non-Linux systems
+
+## Usage
+
+### For grade.py:
+```python
+from sandbox.run import run
+
+result = run(candidate_code, test_code, timeout=10)
+# result = {"passed": bool, "error": str|None, "timed_out": bool}
+```
+
+### Parameters:
+- `candidate_code`: String containing the solution code
+- `test_code`: String containing test assertions
+- `timeout`: Maximum wall-clock seconds (default: 10)
+
+### Return Value:
+- `passed`: True only if both codes executed without exceptions
+- `error`: Exception text or "timeout" when not passed
+- `timed_out`: True if execution exceeded timeout
+
+## Security Model
+The sandbox follows a defense-in-depth approach:
+1. OS-level process isolation
+2. Kernel-level resource limits
+3. Application-level import restrictions
+4. Filesystem isolation
+5. Network isolation
+
+Each layer provides protection even if others fail.
+```

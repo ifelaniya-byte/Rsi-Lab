@@ -1,0 +1,4 @@
+# nvidia/nemotron-3.5-content-safety:free
+# role: safety gate
+
+User Safety: safe

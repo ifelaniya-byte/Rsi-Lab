@@ -1,0 +1,6 @@
+# google/lyria-3-pro-preview
+# role: audio specialist
+
+IDEA: Semantic Topology Gradient Descent (STGD)
+
+HOW: The AI maps its entire codebase into a high-dimensional semantic graph using a specialized
